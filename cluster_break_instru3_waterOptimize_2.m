@@ -1,8 +1,8 @@
 % clear; 
 % close all; 
 
-showSpectrograms = false; 
-showPenalOptim = false; 
+showSpectrograms = true; 
+showPenalOptim = true; 
 penaltyFunction = 'spectral_angle'; 
 levels_break = 2; 
 coh_or_spec = 'spec'; % coherance (coh) or spectra (spec)
@@ -36,20 +36,13 @@ end
 
 % waterDepthCut = 1000; 
 
-
-labelsNums = {'Water Depth'; 'Plate Bndy Dist'; 'Coastline Dist'; ...
-            'Crustal Age'; 'Sediment Thickn'; 'Surface Current'}; 
-finalPenalty = zeros(size(labelsNums,1), 1); 
-for iquant = [2, 3, 4, 5, 6]; 
-
-
 cut1 = 'Instrument'; 
 cut2 = 'Water'; 
-cut3 = labelsNums{iquant}; 
+cut3 = ' '; 
 
 dataSets = struct('data1', string(cats(8).data), ...
                   'data2', OthVarMat(1,:), ...
-                  'data3', OthVarMat(iquant, :)); 
+                  'data3', string(cats(10).data)); 
 
 % shallow =  ( OthVarMat(1,:) < cut1 )'; 
 % seismom = ( string(cats(8).data) ==  cut2)';
@@ -67,16 +60,16 @@ bools = {... % Data 1
               and(OthVarMat(1,:)' >=220, OthVarMat(1,:)' <4160),...
               OthVarMat(1,:)' >=4160}, ...
         ... % Data 3
-           { 'Nope', "Still nope"}}; 
+           { environment, ~environment}}; 
 boolsMult = {}; 
 names = {
     {'Trillium 240', 'Guralp CMG3T 120', 'Trillium Compact'},... % Names 1
     {'Shallow', 'Deep'},... % Names 2
     {[cut3], ['NOT ' cut3]}... % Names 3
     }; 
-splits = [3, 2, 2];
+splits = [3, 2, 0];
 
-loopOptimizePenalty = [ false true true ] ; 
+loopOptimizePenalty = [ false true false ] ; 
 
 % figure(11); clf; hold on; plot(dat'); 
 
@@ -93,9 +86,8 @@ penaltiesijk = {};
 penalties = {}; % Penalties. How to access? penalties{1}{i}; penalties{2}{i,j}; penalties{3}{i,j,k}; 
 
 figure(12); clf; hold on; set(gcf, 'pos', [1921 1648 1505 349]); % Dendrogram figure
-% figure(132); clf; hold on; set(gcf, 'pos', [2017 342 1767 1656]); % Figure to hold a bunch of spectra and other things
-figure(132); clf; hold on; set(gcf, 'pos', [2017 342 2767 1656]); % Figure to hold a bunch of spectra and other things
-pltn = 5; pltm = 7; % rows by collumns of main plot
+figure(132); clf; hold on; set(gcf, 'pos', [2017 342 1767 1656]); % Figure to hold a bunch of spectra and other things
+pltn = 5; pltm = 5; % rows by collumns of main plot
 thissubplot = 1; 
 % figure(133); clf; hold on; set(gcf, 'pos', [2609 485 1175 1513]); % Figure to hold a bunch of penalty curves
 
@@ -105,22 +97,21 @@ for i = [1:splits(1)]; % First level
 for j = [0:splits(2)]; % Second level
 for k = [0:splits(3)]; % Third level
 
-
 if (j<1) & (k>0); continue; end % Doesn't make any sense to split the third layer and not the second. Algorithm breaks without this
 
-[thissubplot, thisname, thisbool] = clusterAtHierarchy(loopOptimizePenalty, 'i', i, j,...
+[thissubplot, thisname, thisbool] = clusterAtHierarchy(loopOptimizePenalty, 'i', i, ...
     thissubplot, pltn, pltm, dataSets.data1, ...
     dat, fnew, penaltyFunction, showPenalOptim, bools, names); 
 
 if j > 0; % Execute this code if we are going in 2 deep. Combine the name and boolean for our second "layer". e.g. "shallow + seismometer = T240"
 
-    [thissubplot, thisname, thisbool] = clusterAtHierarchy(loopOptimizePenalty, 'j', j, k,...
+    [thissubplot, thisname, thisbool] = clusterAtHierarchy(loopOptimizePenalty, 'j', j, ...
         thissubplot, pltn, pltm, dataSets.data2, ...
         dat, fnew, penaltyFunction, showPenalOptim, bools, names, ...
         thisname=thisname, thisbool=thisbool);
 
     if k > 0; % Execute this code if we are going in 3 deep. 
-        [thissubplot, thisname, thisbool] = clusterAtHierarchy(loopOptimizePenalty, 'k', k, 0,...
+        [thissubplot, thisname, thisbool] = clusterAtHierarchy(loopOptimizePenalty, 'k', k, ...
             thissubplot, pltn, pltm, dataSets.data3, ...
             dat, fnew, penaltyFunction, showPenalOptim, bools, names, ...
             thisname=thisname, thisbool=thisbool);
@@ -135,12 +126,9 @@ thiscluster = dat(thisbool, :); % Select the cluster
 
 
 
-if showSpectrograms; 
-    figure(132); 
-    thisax = subplot(pltn, pltm,  thissubplot); thissubplot = thissubplot + 1; % On Figure 132  
-else; 
-    thisax = nan; 
-end
+
+figure(132); 
+thisax = subplot(pltn, pltm,  thissubplot); thissubplot = thissubplot + 1; % On Figure 132  
 penalty = cluster_spread(thiscluster, fnew, replace(thisname, '\newline', '|'), thisax, ...
     showPlot=showSpectrograms, penalty=penaltyFunction); % Main thing! What is the penalty for this cluster? 
 numdat = sum(thisbool); 
@@ -222,9 +210,9 @@ title([num2str(cut1) ' ' cut2 ' ' cut3 ] );
 exportgraphics(figure(12), sprintf('Figures/dendrogram_%s_datswitch_%1.0f_comp%1.0f.pdf', coh_or_spec, datswitch,component)); 
 exportgraphics(figure(132),sprintf('Figures/manual_sep/combined_%s_datswitch_%1.0f_comp%1.0f.png', coh_or_spec, datswitch,component)); 
 
-finalPenalty(iquant) = penaltyTijk; 
 
-end
+
+
 
 
 

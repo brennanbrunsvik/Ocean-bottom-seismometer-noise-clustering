@@ -1,8 +1,8 @@
 % clear; 
 % close all; 
 
-showSpectrograms = false; 
-showPenalOptim = false; 
+showSpectrograms = true; 
+showPenalOptim = true; 
 penaltyFunction = 'spectral_angle'; 
 levels_break = 2; 
 coh_or_spec = 'spec'; % coherance (coh) or spectra (spec)
@@ -36,16 +36,12 @@ end
 
 % waterDepthCut = 1000; 
 
-
-labelsNums = {'Water Depth'; 'Plate Bndy Dist'; 'Coastline Dist'; ...
-            'Crustal Age'; 'Sediment Thickn'; 'Surface Current'}; 
-finalPenalty = zeros(size(labelsNums,1), 1); 
-for iquant = [2, 3, 4, 5, 6]; 
+iquant = 2; 
 
 
 cut1 = 'Instrument'; 
 cut2 = 'Water'; 
-cut3 = labelsNums{iquant}; 
+cut3 = '?'; 
 
 dataSets = struct('data1', string(cats(8).data), ...
                   'data2', OthVarMat(1,:), ...
@@ -135,12 +131,9 @@ thiscluster = dat(thisbool, :); % Select the cluster
 
 
 
-if showSpectrograms; 
-    figure(132); 
-    thisax = subplot(pltn, pltm,  thissubplot); thissubplot = thissubplot + 1; % On Figure 132  
-else; 
-    thisax = nan; 
-end
+
+figure(132); 
+thisax = subplot(pltn, pltm,  thissubplot); thissubplot = thissubplot + 1; % On Figure 132  
 penalty = cluster_spread(thiscluster, fnew, replace(thisname, '\newline', '|'), thisax, ...
     showPlot=showSpectrograms, penalty=penaltyFunction); % Main thing! What is the penalty for this cluster? 
 numdat = sum(thisbool); 
@@ -222,9 +215,9 @@ title([num2str(cut1) ' ' cut2 ' ' cut3 ] );
 exportgraphics(figure(12), sprintf('Figures/dendrogram_%s_datswitch_%1.0f_comp%1.0f.pdf', coh_or_spec, datswitch,component)); 
 exportgraphics(figure(132),sprintf('Figures/manual_sep/combined_%s_datswitch_%1.0f_comp%1.0f.png', coh_or_spec, datswitch,component)); 
 
-finalPenalty(iquant) = penaltyTijk; 
 
-end
+
+
 
 
 

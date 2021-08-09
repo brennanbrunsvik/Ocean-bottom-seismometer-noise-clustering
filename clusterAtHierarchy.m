@@ -1,10 +1,11 @@
-function [thissubplot, thisname, thisbool] = clusterAtHierarchy(loopOptimizePenalty, ijk, index, ...
+function [thissubplot, thisname, thisbool] = clusterAtHierarchy(loopOptimizePenalty, ijk, index, nextIndex, ...
     thissubplot, pltn, pltm, dataSet, ...
     dat, fnew, penaltyFunction, showPenalOptim, bools, names, options); 
     arguments
             loopOptimizePenalty
             ijk
             index
+            nextIndex
             thissubplot
             pltn
             pltm
@@ -30,11 +31,13 @@ else
 end
 
 if loopOptimizePenalty(depthHier); 
-    if showPenalOptim & (index==1);
+    if showPenalOptim & (index==1) & (nextIndex==0);
+        showthisplot = true; 
         figure(132); 
         thisax = subplot(pltn, pltm, thissubplot); 
         thissubplot = thissubplot + 1; % On Figure 132  
     else
+        showthisplot = false; 
         thisax = nan; 
     end
     [     eachPenaltyTempTrue,...
@@ -45,7 +48,7 @@ if loopOptimizePenalty(depthHier);
           eachPenaltyTempTotN,...
           penBreak...
           ] = optimize_penalty(dataSet(thisbool), dat(thisbool,:), fnew, penaltyFunction, ...
-              thisax, and(showPenalOptim, (index==1)), 100); 
+              thisax, showthisplot, 100); 
       [minPen, ipenBreak] = min(eachPenaltyTempTot); 
       penBreakBest = penBreak(ipenBreak); 
       cutInd = penBreakBest; 
