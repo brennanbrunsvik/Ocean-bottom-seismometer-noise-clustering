@@ -24,6 +24,11 @@ if strcmp(options.penalty, 'euclidean');
     dist = sum(dists); % One way of quantifying spread. 
 elseif strcmp(options.penalty, 'spectral_angle'); 
     N = size(clst,1);  %Number of stations
+    
+%     if N == 1; 
+%         disp('Oh no! 1 station in cluster'); 
+%     end
+    
     eachDot = zeros(N, N ); 
     eachNorm = zeros(N, 1); 
     for ispec = [1:N]; % First dimension of clst corresponds to each datum
@@ -57,6 +62,11 @@ elseif strcmp(options.penalty, 'spectral_angle');
     % Now have dot products and norms. 
     
 end
+
+if N <= 1; 
+    dist = NaN; 
+end
+
 % need to have dist and meanSpec come out of penalty function. 
 
 % TODO I don't think RMS is good. I should somehow normalize to account for
@@ -102,7 +112,6 @@ end
 
 semilogx(fnew, meanSpec, 'k', 'linewidth', 3); % Actually just plotting thise here to set x log. 
 cbar = colorbar(); 
-
 
 
 

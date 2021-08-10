@@ -1,4 +1,4 @@
-function [thissubplot, thisname, thisbool] = clusterAtHierarchy(loopOptimizePenalty, ijk, index, nextIndex, ...
+function [thissubplot, thisname, thisbool, penBreakBest] = clusterAtHierarchy(loopOptimizePenalty, ijk, index, nextIndex, ...
     thissubplot, pltn, pltm, dataSet, ...
     dat, fnew, penaltyFunction, showPenalOptim, bools, names, options); 
     arguments
@@ -40,6 +40,10 @@ if loopOptimizePenalty(depthHier);
         showthisplot = false; 
         thisax = nan; 
     end
+    
+%     if strcmp('string', class(dataSet)); % This is categorical. Just break into categories? 
+%     end
+    
     [     eachPenaltyTempTrue,...
           eachPenaltyTempFalse,...
           eachPenaltyTempTot, ...
@@ -61,6 +65,7 @@ if loopOptimizePenalty(depthHier);
       
 else; 
     thisboolNew = bools{depthHier}{index}; % Base level boolean. The dataset corresponding to thisname. 
+    penBreakBest = NaN; 
 end
 
 % thisname = sprintf('%s \n %s - %4.0f m \n', thisname, names{2}{j}, cut2)

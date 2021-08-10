@@ -1,8 +1,8 @@
 % clear; 
 % close all; 
 
-showSpectrograms = false; 
-showPenalOptim = false; 
+showSpectrograms = true; 
+showPenalOptim = true; 
 penaltyFunction = 'spectral_angle'; 
 levels_break = 2; 
 coh_or_spec = 'spec'; % coherance (coh) or spectra (spec)
@@ -36,27 +36,47 @@ end
 
 % waterDepthCut = 1000; 
 
+mergedData = {OthVarMat(1,:), OthVarMat(2,:), OthVarMat(3,:),...
+    OthVarMat(4,:), OthVarMat(5,:), OthVarMat(6,:)...
+    string(cats(7).data), string(cats(8).data), string(cats(9).data),...
+    string(cats(10).data), string(cats(11).data)}; 
+isCat = logical([0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1]); 
 
-labelsNums = {'Water Depth'; 'Plate Bndy Dist'; 'Coastline Dist'; ...
-            'Crustal Age'; 'Sediment Thickn'; 'Surface Current'}; 
-finalPenalty = zeros(size(labelsNums,1), 1); 
-for iquant = [2, 3, 4, 5, 6]; 
+labelsAll = {'Water Depth'; 'Plate Bndy Dist'; 'Coastline Dist'; ...
+            'Crustal Age'; 'Sediment Thickn'; 'Surface Current';...
+            'OBS Design'; 'Seismometer'; 'Pressure Guage'; 'Environment'; 'Experiment'}; 
+finalPenalty = zeros(size(labelsAll,1), 1); 
+for iquant = [3]; 
+% for iquant = [1:length(labelsAll)]; 
 
 
 cut1 = 'Instrument'; 
 cut2 = 'Water'; 
-cut3 = labelsNums{iquant}; 
+cut3 = labelsAll{iquant}; 
 
+tempDat = mergedData(iquant); 
+tempDat = tempDat{1}; 
 dataSets = struct('data1', string(cats(8).data), ...
                   'data2', OthVarMat(1,:), ...
-                  'data3', OthVarMat(iquant, :)); 
+                  'data3', tempDat); 
 
 % shallow =  ( OthVarMat(1,:) < cut1 )'; 
 % seismom = ( string(cats(8).data) ==  cut2)';
 % seismom(:) = nan; % Don't want seismom anymore. 
-environment = ( string(cats(10).data) == cut3)'; 
+% environment = ( string(cats(10).data) == cut3)'; 
 
-
+% Handle the third dataset. Break into each category. 
+if isCat(iquant); 
+    eachTempDat = unique(tempDat); 
+    tempDatBools = {}; 
+    for iUniqueDat = [1:length(eachTempDat)]; 
+        tempDatBools{iUniqueDat} = tempDat' == eachTempDat(iUniqueDat); 
+    end
+    namesAdd = cellstr(eachTempDat); 
+else
+    namesAdd = {[cut3 '<'], [cut3 '>=']};
+    tempDatBools = {"Turn on", "optimization for depth 3"}; 
+end
 
 bools = {... % Data 1
            {(string(cats(8).data)=="Trillium 240")', ...
@@ -67,16 +87,26 @@ bools = {... % Data 1
               and(OthVarMat(1,:)' >=220, OthVarMat(1,:)' <4160),...
               OthVarMat(1,:)' >=4160}, ...
         ... % Data 3
-           { 'Nope', "Still nope"}}; 
+           tempDatBools}; 
 boolsMult = {}; 
 names = {
     {'Trillium 240', 'Guralp CMG3T 120', 'Trillium Compact'},... % Names 1
     {'Shallow', 'Deep'},... % Names 2
-    {[cut3], ['NOT ' cut3]}... % Names 3
+     namesAdd,...%}... % Names 3
     }; 
-splits = [3, 2, 2];
+
+
+% splits = [3, 2, length(unique(tempDat))];
+if isCat(iquant); 
+    splits = [3, 2, length(unique(tempDat))];
+else
+    splits = [3, 2, 2]; 
+end
 
 loopOptimizePenalty = [ false true true ] ; 
+if isCat(iquant); % Can't really loop through categories. The loop is over a quantitative variable...
+    loopOptimizePenalty(3) = false; 
+end
 
 % figure(11); clf; hold on; plot(dat'); 
 
@@ -92,7 +122,7 @@ penaltiesij  = {};
 penaltiesijk = {}; 
 penalties = {}; % Penalties. How to access? penalties{1}{i}; penalties{2}{i,j}; penalties{3}{i,j,k}; 
 
-figure(12); clf; hold on; set(gcf, 'pos', [1921 1648 1505 349]); % Dendrogram figure
+figure(12); clf; hold on; set(gcf, 'pos', [1601 1609 1846 388]); % Dendrogram figure
 % figure(132); clf; hold on; set(gcf, 'pos', [2017 342 1767 1656]); % Figure to hold a bunch of spectra and other things
 figure(132); clf; hold on; set(gcf, 'pos', [2017 342 2767 1656]); % Figure to hold a bunch of spectra and other things
 pltn = 5; pltm = 7; % rows by collumns of main plot
@@ -108,19 +138,19 @@ for k = [0:splits(3)]; % Third level
 
 if (j<1) & (k>0); continue; end % Doesn't make any sense to split the third layer and not the second. Algorithm breaks without this
 
-[thissubplot, thisname, thisbool] = clusterAtHierarchy(loopOptimizePenalty, 'i', i, j,...
+[thissubplot, thisname, thisbool, penBreakBest] = clusterAtHierarchy(loopOptimizePenalty, 'i', i, j,...
     thissubplot, pltn, pltm, dataSets.data1, ...
     dat, fnew, penaltyFunction, showPenalOptim, bools, names); 
 
 if j > 0; % Execute this code if we are going in 2 deep. Combine the name and boolean for our second "layer". e.g. "shallow + seismometer = T240"
 
-    [thissubplot, thisname, thisbool] = clusterAtHierarchy(loopOptimizePenalty, 'j', j, k,...
+    [thissubplot, thisname, thisbool, penBreakBest] = clusterAtHierarchy(loopOptimizePenalty, 'j', j, k,...
         thissubplot, pltn, pltm, dataSets.data2, ...
         dat, fnew, penaltyFunction, showPenalOptim, bools, names, ...
         thisname=thisname, thisbool=thisbool);
 
     if k > 0; % Execute this code if we are going in 3 deep. 
-        [thissubplot, thisname, thisbool] = clusterAtHierarchy(loopOptimizePenalty, 'k', k, 0,...
+        [thissubplot, thisname, thisbool, penBreakBest] = clusterAtHierarchy(loopOptimizePenalty, 'k', k, 0,...
             thissubplot, pltn, pltm, dataSets.data3, ...
             dat, fnew, penaltyFunction, showPenalOptim, bools, names, ...
             thisname=thisname, thisbool=thisbool);
@@ -160,17 +190,78 @@ if i > 0; y = y - 1; end
 if j > 0; y = y - 1; end 
 if k > 0; y = y - 1; end
 
-x = (i-1.5) * 1; 
-if j > 0; 
-    x = x + (j-1.5) ./ splits(2); 
-    if k > 0; 
-        x = x + (k-1.5) ./ splits(3); 
-    end
+% x = (i-1.5) * 1; 
+% if j > 0; 
+%     x = x + (j-1.5) ./ splits(2); 
+%     if k > 0; 
+%         x = x + (k-1.5) ./ splits(3); 
+%     end
+% end
+
+% posibX = linspace(-1, 1, splits(1))/splits(1); 
+% posibX = linspace(-.5, .5, splits(1))/splits(1); 
+% x = posibX(i); 
+% if j >= 1; 
+% %     posibX = linspace(-1, 1, splits(2))/(splits(2)+1)/splits(1); 
+%     posibX = linspace(-.5, .5, splits(2))/(splits(2)+2)/splits(1); 
+%     x = x + posibX(j); 
+% end
+% if k >= 1; 
+% %     posibX = linspace(-1, 1, splits(3))/(splits(3)+1)/splits(2)/splits(1); 
+% %     posibX = linspace(-2, 2, splits(3))/(splits(3)+2)/splits(2)/splits(1); % Don't fully understand why [-2, 2] works...
+%     posibX = linspace(-1, 1, splits(3))/(splits(3)+2)/splits(2)/splits(1); % Don't fully understand why [-2, 2] works...
+% 
+%     x = x + posibX(k); 
+% end
+
+posibX = linspace(-.5, .5, splits(1)); 
+x = posibX(i); 
+if j >= 1; 
+%     posibX = linspace(-1, 1, splits(2))/(splits(2)+1)/splits(1); 
+    posibX = linspace(-.5, .5, splits(2))/(splits(1)) .* .8; 
+    x = x + posibX(j); 
+end
+if k >= 1; 
+%     posibX = linspace(-1, 1, splits(3))/(splits(3)+1)/splits(2)/splits(1); 
+%     posibX = linspace(-2, 2, splits(3))/(splits(3)+2)/splits(2)/splits(1); % Don't fully understand why [-2, 2] works...
+    posibX = linspace(-.5, .5, splits(3))/splits(2)/splits(1) .* 1; % Don't fully understand why [-2, 2] works...
+
+    x = x + posibX(k); 
 end
 
 figure(12); 
-scatter(x, y, 1); 
-thistxt = text(x, y, thisname, 'Rotation', 0, 'HorizontalAlignment', 'center'); 
+scatter(x, y, .01); 
+
+%Get minimum amount of text needed to describe a cluster. such a PITA
+%without being able to do names{3}(k){1}, like I can in Python. 
+if k > 0; 
+    tempNames = names{3}; 
+    thisText = tempNames(k); 
+    thisText = thisText{1}; 
+    if loopOptimizePenalty(3); 
+        thisText = [thisText sprintf('%1.2f', penBreakBest) '\newline']; % Only give new line for third depth if doing optimization. Not categories. Too many categories...
+    end
+elseif j > 0; 
+    tempNames = names{2}; 
+    thisText = tempNames(j); 
+    thisText = thisText{1}; 
+    if loopOptimizePenalty(2); 
+        thisText = [thisText ' ' sprintf('%1.2f', penBreakBest)]; 
+    end
+    thisText = [thisText '\newline'] % Always give new line for second depth. 
+else; 
+    tempNames = names{1}; 
+    thisText = tempNames{i}; 
+    thisText = [thisText '\newline']; 
+%     thisText = thisText{1}; % Not sure why but I need to comment this
+%     out? 
+end
+% thisText  = sprintf('%s n=%3.0f, P/n=%2.2f', thisText, numdat, penalty/numdat); 
+thisText = [thisText sprintf('n=%3.0f, P/n=%2.2f',numdat, penalty/numdat)];  % Can't just use sprintf over the whole thing. Else \newline will be erased. How obnoxious. 
+
+% thistxt = text(x, y, thisname, 'Rotation', 0, 'HorizontalAlignment', 'center'); 
+textPlot = text(x, y, thisText, 'Rotation', 37, 'HorizontalAlignment', 'center'); 
+
 %%%
 
 end
@@ -195,13 +286,14 @@ for k = [0:splits(3)]; % Third level
 %     k = 0; 
 if (j<1) & (k>0); continue; end % Doesn't make any sense to split the third layer and not the second. Algorithm breaks without this
 if j < 1; % Only on first layer
-    penaltyTi = penaltyTi + penaltiesi{i}; 
+    penaltyTi = nansum([penaltyTi , penaltiesi{i}]); 
 end
 if (j > 0) & (k < 1); 
-    penaltyTij = penaltyTij + penaltiesij{i}{j}; 
+    penaltyTij = nansum([penaltyTij , penaltiesij{i}{j}]); % 2021.08.10 will need to put this line in any similar codes, due to making N=1,0 clusters have NaN spread and not 0 and Inf.  
 end
 if k > 0; 
-    penaltyTijk = penaltyTijk + penaltiesijk{i}{j}{k}; 
+%     disp(penaltiesijk{i}{j}{k})
+    penaltyTijk = nansum([penaltyTijk , penaltiesijk{i}{j}{k}]); 
 end
 end
 end
@@ -217,31 +309,37 @@ text(xtxt, -1, sprintf('Tot P=%6.0f', penaltyTi  ), 'HorizontalAlignment', 'righ
 text(xtxt, -2, sprintf('Tot P=%6.0f', penaltyTij ), 'HorizontalAlignment', 'right'); 
 text(xtxt, -3, sprintf('Tot P=%6.0f', penaltyTijk), 'HorizontalAlignment', 'right'); 
 
-title([num2str(cut1) ' ' cut2 ' ' cut3 ] ); 
+title(sprintf('%s, Datswitch=%1.0f, Component=%1.0f, %s -> %s -> %s', coh_or_spec, datswitch, component, cut1, cut2, cut3) ); 
 
-exportgraphics(figure(12), sprintf('Figures/dendrogram_%s_datswitch_%1.0f_comp%1.0f.pdf', coh_or_spec, datswitch,component)); 
-exportgraphics(figure(132),sprintf('Figures/manual_sep/combined_%s_datswitch_%1.0f_comp%1.0f.png', coh_or_spec, datswitch,component)); 
+ylim([-3.5, 0]); 
+% xlim([-.275, .275]); 
+xlim([-1, 1]); 
+
+textFig = sprintf('%s_comp%1.0f_datswitch%1.0f-%s-%s-%s', coh_or_spec, datswitch, component, cut1, cut2, cut3) 
+exportgraphics(figure(12), sprintf('Figures/dendrogram__%s.pdf', textFig)); 
+exportgraphics(figure(132),sprintf('Figures/manual_sep/combined__%s.pdf', textFig)); 
 
 finalPenalty(iquant) = penaltyTijk; 
 
 end
 
 
+% Can plot histogram of final penalty, based on each third hierarchy depth
+figure(70); clf; hold on; 
+barh(finalPenalty)
 
-% % % 
-% % % %%% Very manual approach below. 
-% % % % Split into shallow and deep
-% % % pen = cluster_spread(dat( shallow,:), fnew, 'Z<2000'); 
-% % % pen = cluster_spread(dat(~shallow,   :), fnew, 'Z>2000'); 
-% % % pen = cluster_spread(dat( :   ,   :), fnew, 'Z all'); 
-% % % 
-% % % 
-% % % % Split into Trillium 240 and not Trillium 240
-% % % pen = cluster_spread(dat( seismom,:), fnew, 'Seismom T 240'); 
-% % % pen = cluster_spread(dat(~seismom,   :), fnew, 'Seismom ~T240'); 
-% % % pen = cluster_spread(dat( :   ,   :), fnew, 'Seismom all'); 
-% % % % 'Trillium 240'
+set(gca, 'yticklabel', labelsAll)
+for itxt = [1:length(labelsAll)]; 
+    text(0, itxt, labelsAll{itxt}); 
+end
 
+xlabel('Penalty using this variable as third hierarchy depth'); 
+set(gca, 'ytick', []); 
+
+box on; 
+grid on; 
+
+exportgraphics(gcf, 'FIGURES/third_var_clusters_bar.pdf'); 
 
 
 
