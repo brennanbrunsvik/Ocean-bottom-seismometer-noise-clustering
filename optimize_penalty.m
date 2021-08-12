@@ -8,6 +8,7 @@ function [eachPenaltyTempTrue,...
           ] = optimize_penalty(thisData, dat, fnew, penaltyFunction, thisax, showPlot, numCut); 
 
 % thisData = dataSets.data1; 
+
 newBreaks = linspace(min(thisData), max(thisData), numCut); 
 eachPenaltyTempTrue = nan(size(newBreaks)); 
 eachPenaltyTempFalse = nan(size(newBreaks)); 

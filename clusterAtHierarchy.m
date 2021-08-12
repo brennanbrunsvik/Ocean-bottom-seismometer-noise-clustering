@@ -20,6 +20,11 @@ function [thissubplot, thisname, thisbool, penBreakBest] = clusterAtHierarchy(lo
             options.thisbool = nan
     end
 %
+
+if any(isnan(dataSet)); 
+    disp('nans!'); 
+end
+
 depthHier = find(string({'i', 'j', 'k'})==ijk); 
 
 if strcmp(ijk, 'i'); 

@@ -31,8 +31,15 @@ load([getdr,'/',datfile;])
 spc_stack=squeeze(spc_stack(:,:,component)); % vertical only right now
 
 % Finding the bad stations:
-bind=find(isnan(sum(spc_stack))==1);
-gind=find(isnan(sum(spc_stack))==0);
+% Finding the bad stations:
+if sameStasAllAnalyses; 
+    load('stations_good_all_analyses.mat'); % generated using /Users/brennanbrunsvik/Documents/UCSB/ORCA/Noise_clustering/Manual_clustering/findGoodStas.m
+    bind = badDatAll; 
+    gind = goodDatAll; 
+else; 
+    bind=find(isnan(sum(coh_stack))==1);
+    gind=find(isnan(sum(coh_stack))==0);
+end
 spc_stack(:,bind)=[];
 spc_stack=spc_stack';
 
@@ -78,15 +85,15 @@ SomVals=spc_stack_filt;
 % numeric, continuous, no nan
 OthVarMat=nan(6,size(SomVals,1));
 OthVarMat(1,:)=elev_vec(gind);
-suff{1} = 'Water Depth (m)';
+suff{1} = 'Water Depth (m)'; % No nan values
 OthVarMat(2,:)=pltbnd(gind);
-suff{2} = 'Plate Bndy Dist (km)';
+suff{2} = 'Plate Bndy Dist (km)'; % No nan values
 OthVarMat(3,:)=lndvec(gind);
-suff{3} = 'Coastline Dist (km)';
+suff{3} = 'Coastline Dist (km)'; % No nan values
 
-sedvec(find(isnan(sedvec))) = -2000;
-crsage(find(isnan(crsage))) = -50;
-srfcur(find(isnan(srfcur))) = -0.5;
+% sedvec(find(isnan(sedvec))) = -2000;
+% crsage(find(isnan(crsage))) = -50;
+% srfcur(find(isnan(srfcur))) = -0.5;
 
 OthVarMat(4,:)=crsage(gind);
 suff{4} = 'Crustal Age (Myr)';

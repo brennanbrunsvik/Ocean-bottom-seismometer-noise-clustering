@@ -1,10 +1,10 @@
 % clear; 
 % close all; 
 sameStasAllAnalyses = true; 
-showSpectrograms = false; 
-showPenalOptim = false; 
+showSpectrograms = true; 
+showPenalOptim = true; 
 penaltyFunction = 'spectral_angle'; 
-levels_break = 3; 
+levels_break = 2; 
 coh_or_spec = 'spec'; % coherance (coh) or spectra (spec)
 
 OBS_TableParams;
@@ -46,7 +46,7 @@ labelsAll = {'Water Depth'; 'Plate Bndy Dist'; 'Coastline Dist'; ...
             'Crustal Age'; 'Sediment Thickn'; 'Surface Current';...
             'OBS Design'; 'Seismometer'; 'Pressure Guage'; 'Environment'; 'Experiment'}; 
 finalPenalty = zeros(size(labelsAll,1), 1); 
-for iquant = [4]; 
+for iquant = [3]; 
 % for iquant = [1:length(labelsAll)]; 
 
 
@@ -102,12 +102,6 @@ if isCat(iquant);
 else
     splits = [3, 2, 2]; 
 end
-if levels_break < 3; 
-    splits(3) = 0; % MANUAL change this to only go 2 layers deep or 3
-end
-if splits(3) == 0;
-    cut3 = ''; 
-end
 
 loopOptimizePenalty = [ false true true ] ; 
 if isCat(iquant); % Can't really loop through categories. The loop is over a quantitative variable...
@@ -140,6 +134,7 @@ thissubplot = 1;
 for i = [1:splits(1)]; % First level
 for j = [0:splits(2)]; % Second level
 for k = [0:splits(3)]; % Third level
+
 
 if (j<1) & (k>0); continue; end % Doesn't make any sense to split the third layer and not the second. Algorithm breaks without this
 
@@ -312,9 +307,7 @@ xtxt = xtxt(1);
 % scatter(xtxt, -1); 
 text(xtxt, -1, sprintf('Tot P=%6.0f', penaltyTi  ), 'HorizontalAlignment', 'right'); 
 text(xtxt, -2, sprintf('Tot P=%6.0f', penaltyTij ), 'HorizontalAlignment', 'right'); 
-if splits(3) > 0; 
-    text(xtxt, -3, sprintf('Tot P=%6.0f', penaltyTijk), 'HorizontalAlignment', 'right'); 
-end
+text(xtxt, -3, sprintf('Tot P=%6.0f', penaltyTijk), 'HorizontalAlignment', 'right'); 
 
 title(sprintf('%s, Datswitch=%1.0f, Component=%1.0f, %s -> %s -> %s', coh_or_spec, datswitch, component, cut1, cut2, cut3) ); 
 
@@ -322,7 +315,7 @@ ylim([-3.5, 0]);
 % xlim([-.275, .275]); 
 xlim([-1, 1]); 
 
-textFig = sprintf('%s_Datswitch%1.0f_Comp%1.0f-%s-%s-%s', coh_or_spec, datswitch, component, cut1, cut2, cut3) 
+textFig = sprintf('%s_comp%1.0f_datswitch%1.0f-%s-%s-%s', coh_or_spec, datswitch, component, cut1, cut2, cut3) 
 exportgraphics(figure(12), sprintf('Figures/dendrogram__%s.pdf', textFig)); 
 exportgraphics(figure(132),sprintf('Figures/manual_sep/combined__%s.pdf', textFig)); 
 

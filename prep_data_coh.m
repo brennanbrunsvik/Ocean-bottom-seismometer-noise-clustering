@@ -28,8 +28,14 @@ load([getdr,'/',datfile;])
 coh_stack=squeeze(coh_stack(:,:,component)); % vertical only right now
 
 % Finding the bad stations:
-bind=find(isnan(sum(coh_stack))==1);
-gind=find(isnan(sum(coh_stack))==0);
+if sameStasAllAnalyses; 
+    load('stations_good_all_analyses.mat'); % generated using /Users/brennanbrunsvik/Documents/UCSB/ORCA/Noise_clustering/Manual_clustering/findGoodStas.m
+    bind = badDatAll; 
+    gind = goodDatAll; 
+else; 
+    bind=find(isnan(sum(coh_stack))==1);
+    gind=find(isnan(sum(coh_stack))==0);
+end
 coh_stack(:,bind)=[];
 coh_stack=coh_stack';
 
@@ -77,9 +83,9 @@ suff{2} = 'Plate Bndy Dist (km)';
 OthVarMat(3,:)=lndvec(gind);
 suff{3} = 'Coastline Dist (km)';
 
-sedvec(find(isnan(sedvec))) = -2000;
-crsage(find(isnan(crsage))) = -50;
-srfcur(find(isnan(srfcur))) = -0.5;
+% sedvec(find(isnan(sedvec))) = -2000;
+% crsage(find(isnan(crsage))) = -50;
+% srfcur(find(isnan(srfcur))) = -0.5;
 
 OthVarMat(4,:)=crsage(gind);
 suff{4} = 'Crustal Age (Myr)';
