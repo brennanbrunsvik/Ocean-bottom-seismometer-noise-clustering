@@ -21,10 +21,6 @@ function [thissubplot, thisname, thisbool, penBreakBest] = clusterAtHierarchy(lo
     end
 %
 
-if any(isnan(dataSet)); 
-    disp('nans!'); 
-end
-
 depthHier = find(string({'i', 'j', 'k'})==ijk); 
 
 if strcmp(ijk, 'i'); 
@@ -65,7 +61,9 @@ if loopOptimizePenalty(depthHier);
       if index == 1; 
           thisboolNew = (dataSet  < penBreakBest)'; % 
       elseif index == 2; 
-          thisboolNew = (dataSet >= penBreakBest)'; % 
+          thisboolNew = (dataSet >= penBreakBest)'; % excludes nans!!!! any nans will come back as false. They are evaluated when index == 3. 
+      elseif index == 3; 
+          thisboolNew = isnan(dataSet)'; 
       end
       
 else; 
