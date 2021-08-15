@@ -24,7 +24,7 @@ function [thissubplot, thisname, thisbool, penBreakBest] = clusterAtHierarchy(lo
 depthHier = find(string({'i', 'j', 'k'})==ijk); 
 
 if strcmp(ijk, 'i'); 
-    thisname = names{depthHier}{index}
+    thisname = names{depthHier}{index}; 
 	thisbool = logical(ones(size(dat,1), 1)); 
 else
     thisname = [options.thisname '\newline' names{depthHier}{index}]; 

@@ -19,8 +19,12 @@ datCompSpec = {...
     {2,1,'coh'},... % Not positive if this is all of them. 
     };
 
-for idatcomp = [1]; 
-% for idatcomp = [1:size(datcomp, 1)]; 
+labelsAll = {'Water Depth'; 'Plate Bndy Dist'; 'Coastline Dist'; ...
+            'Crustal Age'; 'Sediment Thickn'; 'Surface Current';...
+            'OBS Design'; 'Seismometer'; 'Pressure Guage'; 'Environment'; 'Experiment'}; % Should be able to remove this from here, but I was using it for size(...)
+
+% for idatcomp = [1]; 
+for idatcomp = [1:size(datCompSpec,2)]; 
 
 thisDatCompSpec = datCompSpec{idatcomp}; 
 datswitch   = thisDatCompSpec{1}; 
@@ -31,19 +35,18 @@ eachPenalty = zeros(size(labelsAll,1), 1); % Penalty to collect while doing the 
 % for iquant = [2]; 
 for iquant = [1:length(labelsAll)]; % Slower to put the loop so high up in code, but makes it easier to think and develop the code. 
 
-eachPenalty(iquant) = clusterWholeHierarchy(sameStasAllAnalyses, ...
+[eachPenalty(iquant), penaltyUnClust] = clusterWholeHierarchy(sameStasAllAnalyses, ...
     showSpectrograms, showPenalOptim, penaltyFunction, ...
     coh_or_spec, datswitch, component, iquant) % !!! Do all the real processing here. 
-    
-% eachPenalty(iquant) = penaltyTijk; 
+% Not really a need to get penaltyUnClust each time. But this was easiest
+% to code. 
 
 end
-end
 
+finPenData = struct('eachPenalty', eachPenalty, 'labelsAll', labelsAll, 'penaltyUnClust', penaltyUnClust); % Add other things later. 
 finPenFile = sprintf('pen_results/penalties_%s_datswitch%1.0f_component%1.0f_3layer.mat',...
     coh_or_spec, datswitch, component); 
-save(finPenFile, 'eachPenalty'); 
-
+save(finPenFile, 'finPenData'); 
 
 % Can plot histogram of final penalty, based on each third hierarchy depth
 figure(70); clf; hold on; 
@@ -61,6 +64,8 @@ box on;
 grid on; 
 
 exportgraphics(gcf, 'FIGURES/third_var_clusters_bar.pdf'); 
+
+end
 
 
 

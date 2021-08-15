@@ -5,7 +5,6 @@ showSpectrograms = true;
 showPenalOptim = true; 
 penaltyFunction = 'spectral_angle'; 
 coh_or_spec = 'spec'; % coherance (coh) or spectra (spec)
-sameStasAllAnalyses = true; 
 
 OBS_TableParams;
 datswitch = 1; % Look in prep data

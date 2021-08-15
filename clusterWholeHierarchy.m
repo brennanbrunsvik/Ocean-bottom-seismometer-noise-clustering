@@ -1,4 +1,4 @@
-function [penaltyTijk] = clusterWholeHierarchy(sameStasAllAnalyses, ...
+function [penaltyTijk, penaltyUnClust] = clusterWholeHierarchy(sameStasAllAnalyses, ...
     showSpectrograms, showPenalOptim, penaltyFunction, ...
     coh_or_spec, datswitch, component, iquant); 
 
@@ -39,8 +39,8 @@ isCat = logical([0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1]);
 labelsAll = {'Water Depth'; 'Plate Bndy Dist'; 'Coastline Dist'; ...
             'Crustal Age'; 'Sediment Thickn'; 'Surface Current';...
             'OBS Design'; 'Seismometer'; 'Pressure Guage'; 'Environment'; 'Experiment'}; 
-% % for iquant = [2]; 
-% for iquant = [1:length(labelsAll)]; 
+
+
 
 
 cut1 = 'Instrument'; 
@@ -120,7 +120,7 @@ end
 % First get whole dataset
 figure(2); clf; set(gcf, 'pos', [2731 1103 496 401]); 
 thisax = nan; % Just need to pass ax object to some functions even if it isn't used. 
-penalty = cluster_spread(dat, fnew, 'All data', gca, showPlot=true, penalty=penaltyFunction);
+penaltyUnClust = cluster_spread(dat, fnew, 'All data', gca, showPlot=false, penalty=penaltyFunction);
 
 penaltiesi   = {}; 
 penaltiesij  = {}; 
@@ -254,7 +254,7 @@ elseif j > 0;
     if loopOptimizePenalty(2); 
         thisText = [thisText ' ' sprintf('%1.2f', penBreakBest)]; 
     end
-    thisText = [thisText '\newline'] % Always give new line for second depth. 
+    thisText = [thisText '\newline']; % Always give new line for second depth. 
 else; 
     tempNames = names{1}; 
     thisText = tempNames{i}; 

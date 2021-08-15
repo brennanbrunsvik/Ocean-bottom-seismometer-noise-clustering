@@ -20,7 +20,7 @@ TFdir = 'TRANSFUN_GOOD';
 
 %%%% extable = '~/Dropbox/PAPERS/2021/OBSIP_TiltCmp_Review/OBS_Working4Paper.xlsx';
 % mattable = '~/Dropbox/PAPERS/2021/OBSIP_TiltCmp_Review/OBS_Working4Paper.mat';
-mattable = 'OBS_Working4Paper.mat'
+mattable = 'OBS_Working4Paper.mat'; 
 
 flo_vec = 1./[500 10 30 500 30];
 fhi_vec = 1./[1 1 10 30 1];
