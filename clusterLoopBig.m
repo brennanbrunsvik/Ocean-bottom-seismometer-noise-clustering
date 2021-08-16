@@ -25,9 +25,10 @@ labelsAll = {'Water Depth'; 'Plate Bndy Dist'; 'Coastline Dist'; ...
 
 % This chooses which analysis to do. Loop through all analyses, or just do
 % some. 
-eachLayerDepth = [1];% [1,3]; 
-eachDatComp = [1:size(datCompSpec,2)]; 
-eachQuant = [1:length(labelsAll)];         
+eachLayerDepth = [3]; % [1,3]; 
+eachDatComp = [1]; % [1:size(datCompSpec,2)]; 
+eachQuant = [4]; % [1:length(labelsAll)];         
+savePenaltFile = false; 
         
 for iLayerDepth = eachLayerDepth; % Do layer depths seperately. Easiest coding solution, since single or multiple layer analyses used the same figure windows, and were originally intended to run seperately. 
 for idatcomp = eachDatComp; % Loop through all combinations of datswitcs, seismometer component, and spectra/coherance. 
@@ -59,7 +60,9 @@ end
 finPenData = struct('eachPenalty', eachPenalty, 'labelsAll', labelsAll, 'penaltyUnClust', penaltyUnClust); % Add other things later. 
 finPenFile = sprintf('pen_results/penalties_%s_layerDepth%1.0f_datswitch%1.0f_component%1.0f.mat',...
     coh_or_spec, iLayerDepth, datswitch, component); 
-save(finPenFile, 'finPenData');
+if savePenaltFile; 
+    save(finPenFile, 'finPenData');
+end
 % disp('NOT SAVING FINPENFILE RIGHT NOW')
 
 % % Can plot histogram of final penalty, based on each third hierarchy depth

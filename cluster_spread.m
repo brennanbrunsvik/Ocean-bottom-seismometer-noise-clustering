@@ -8,6 +8,7 @@ function dist = cluster_spread(clst, fnew, thistitle, thisax, options);
         options.showPlot = false
         options.penalty = 'euclidean'
         options.ampLim = 1; % 1 for OBS data. 2 for coherance. 
+        options.barePlot = false; 
     end
 % if length(varargin) > 0; 
 %     showPlot = varargin{1}; 
@@ -80,9 +81,6 @@ axes(thisax);
 % if size(clst) > 0; 
 semilogx(fnew, meanSpec, 'k'); % Actually just plotting thise here to set x log. 
 hold on; 
-box on; 
-grid on ;
-title([thistitle sprintf(' - P: %5.1f. P/n: %3.1f', dist, dist / size(dists,1))] ); 
 
 vmin = min(dists); vmax = max(dists); cm = colormap(parula(255)); 
 if length(dists) > 2; 
@@ -95,11 +93,9 @@ end
 if max(max(clst)) < -30; % Probably db scale
 xlim([min(fnew), max(fnew)]); 
 ylim([-200, -50]); 
-xlabel('Frequency (Hz)')
-ylabel('dB')
+if ~ options.barePlot; xlabel('Frequency (Hz)'); ylabel('dB'); end
 else
-xlabel('Frequency (Hz)')
-ylabel('Coherance?'); 
+if ~ options.barePlot; xlabel('Frequency (Hz)'); ylabel('Coherance?'); end
 end
 
 % semilogx(fnew, clst'); 
@@ -111,8 +107,16 @@ for ispec = [1:length(dists)];
 end
 
 semilogx(fnew, meanSpec, 'k', 'linewidth', 3); % Actually just plotting thise here to set x log. 
-cbar = colorbar(); 
-
+if ~ options.barePlot; 
+    cbar = colorbar(); 
+    box on; 
+    grid on ;
+    title([thistitle sprintf(' - P: %5.1f. P/n: %3.1f', dist, dist / size(dists,1))] ); 
+else;
+%     disp('Do some stuff'); 
+    xticks([]); 
+    yticks([])
+end
 
 
 

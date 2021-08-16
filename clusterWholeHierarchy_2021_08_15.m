@@ -134,10 +134,6 @@ pltn = 5; pltm = 7; % rows by collumns of main plot
 thissubplot = 1; 
 % figure(133); clf; hold on; set(gcf, 'pos', [2609 485 1175 1513]); % Figure to hold a bunch of penalty curves
 
-figure(134); clf; hold on; set(gcf, 'pos', [-1196 357 953 646]); % Experimental figure to combine dendrogram and spectra plots. 
-ax134 = gca(); 
-xlim([0, 1]); ylim([0,1]); 
-axis off; 
 
 % Start the main loop. 
 for i = [1:splits(1)]; % First level
@@ -175,7 +171,6 @@ thiscluster = dat(thisbool, :); % Select the cluster
 %     continue; 
 % end
 
-
 if showSpectrograms; 
     figure(132); 
     thisax = subplot(pltn, pltm,  thissubplot); thissubplot = thissubplot + 1; % On Figure 132  
@@ -195,17 +190,51 @@ else;
     penaltiesi{i} = penalty; 
 end
 
+%%% This section just for visualizing. 
+y = 0; x = 0; 
+if i > 0; y = y - 1; end 
+if j > 0; y = y - 1; end 
+if k > 0; y = y - 1; end
 
-% Inset figures of spectra within dendrogram plot
-[xInset, yInset, widthIns, heightIns] = ijkToAxPos2(i,j,k,splits(1),splits(2),splits(3)); % Get position to plot in dendrogram
-figure(134); 
-axIns = axes('Position', [xInset-.5*widthIns, yInset-.5*heightIns, widthIns, heightIns]); 
-[~] = cluster_spread(thiscluster, fnew, replace(thisname, '\newline', '|'), axIns, ...
-    showPlot=true, penalty=penaltyFunction, barePlot=true); % Just using this to plot spectra cluster again. 
-% dendroConnectLines; 
+% x = (i-1.5) * 1; 
+% if j > 0; 
+%     x = x + (j-1.5) ./ splits(2); 
+%     if k > 0; 
+%         x = x + (k-1.5) ./ splits(3); 
+%     end
+% end
 
+% posibX = linspace(-1, 1, splits(1))/splits(1); 
+% posibX = linspace(-.5, .5, splits(1))/splits(1); 
+% x = posibX(i); 
+% if j >= 1; 
+% %     posibX = linspace(-1, 1, splits(2))/(splits(2)+1)/splits(1); 
+%     posibX = linspace(-.5, .5, splits(2))/(splits(2)+2)/splits(1); 
+%     x = x + posibX(j); 
+% end
+% if k >= 1; 
+% %     posibX = linspace(-1, 1, splits(3))/(splits(3)+1)/splits(2)/splits(1); 
+% %     posibX = linspace(-2, 2, splits(3))/(splits(3)+2)/splits(2)/splits(1); % Don't fully understand why [-2, 2] works...
+%     posibX = linspace(-1, 1, splits(3))/(splits(3)+2)/splits(2)/splits(1); % Don't fully understand why [-2, 2] works...
+% 
+%     x = x + posibX(k); 
+% end
 
-[x, y] = ijkToAxPos(i,j,k,splits(1),splits(2),splits(3)); % Get position to plot in dendrogram
+posibX = linspace(-.5, .5, splits(1)); 
+x = posibX(i); 
+if j >= 1; 
+%     posibX = linspace(-1, 1, splits(2))/(splits(2)+1)/splits(1); 
+    posibX = linspace(-.5, .5, splits(2))/(splits(1)) .* .8; 
+    x = x + posibX(j); 
+end
+if k >= 1; 
+%     posibX = linspace(-1, 1, splits(3))/(splits(3)+1)/splits(2)/splits(1); 
+%     posibX = linspace(-2, 2, splits(3))/(splits(3)+2)/splits(2)/splits(1); % Don't fully understand why [-2, 2] works...
+    posibX = linspace(-.5, .5, splits(3))/splits(2)/splits(1) .* 1; % Don't fully understand why [-2, 2] works...
+
+    x = x + posibX(k); 
+end
+
 figure(12); 
 scatter(x, y, .01); 
 
@@ -299,6 +328,5 @@ xlim([-1, 1]);
 textFig = sprintf('%s_Datswitch%1.0f_Comp%1.0f-%s-%s-%s', coh_or_spec, datswitch, component, cut1, cut2, cut3);  
 exportgraphics(figure(12), sprintf('Figures/dendrogram__%s.pdf', textFig)); 
 exportgraphics(figure(132),sprintf('Figures/manual_sep/combined__%s.pdf', textFig));
-exportgraphics(figure(134), sprintf('Figures/dendrogram_spec__%s.pdf', textFig)); 
 
 end
