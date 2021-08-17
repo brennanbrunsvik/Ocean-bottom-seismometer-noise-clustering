@@ -127,6 +127,7 @@ penaltiesi   = {};
 penaltiesij  = {}; 
 penaltiesijk = {}; 
 penalties = {}; % Penalties. How to access? penalties{1}{i}; penalties{2}{i,j}; penalties{3}{i,j,k}; 
+bootBools = {}; % for Bootstrap like analysis. Keep each of the final bools. Mostly just so I know how many things are in each final cluster. 
 
 figure(12); clf; hold on; set(gcf, 'pos', [1601 1609 1846 388]); % Dendrogram figure
 % figure(132); clf; hold on; set(gcf, 'pos', [2017 342 1767 1656]); % Figure to hold a bunch of spectra and other things
@@ -163,6 +164,7 @@ if j > 0; % Execute this code if we are going in 2 deep. Combine the name and bo
             thissubplot, pltn, pltm, dataSets.data3, ...
             dat, fnew, penaltyFunction, showPenalOptim, bools, names, ...
             thisname=thisname, thisbool=thisbool);
+        bootBools{end+1} = thisbool; 
 
 %         thisname = [thisname '\newline' names{3}{k}]; 
 %         thisbool = and(thisbool, bools{3}{k}); 
@@ -196,50 +198,49 @@ else;
     penaltiesi{i} = penalty; 
 end
 
+if showSpectrograms; 
+    % Inset figures of spectra within dendrogram plot
+    [xInset, yInset, widthIns, heightIns] = ijkToAxPos2(i,j,k,splits(1),splits(2),splits(3)); % Get position to plot in dendrogram
+    figure(134); 
+    axIns = axes('Position', [xInset-.5*widthIns, yInset-.5*heightIns, widthIns, heightIns]); 
+    [~] = cluster_spread(thiscluster, fnew, replace(thisname, '\newline', '|'), axIns, ...
+        showPlot=true, penalty=penaltyFunction, barePlot=true); % Just using this to plot spectra cluster again. 
+    % dendroConnectLines; 
 
-% Inset figures of spectra within dendrogram plot
-[xInset, yInset, widthIns, heightIns] = ijkToAxPos2(i,j,k,splits(1),splits(2),splits(3)); % Get position to plot in dendrogram
-figure(134); 
-axIns = axes('Position', [xInset-.5*widthIns, yInset-.5*heightIns, widthIns, heightIns]); 
-[~] = cluster_spread(thiscluster, fnew, replace(thisname, '\newline', '|'), axIns, ...
-    showPlot=true, penalty=penaltyFunction, barePlot=true); % Just using this to plot spectra cluster again. 
-% dendroConnectLines; 
 
+    [x, y] = ijkToAxPos(i,j,k,splits(1),splits(2),splits(3)); % Get position to plot in dendrogram
+    figure(12); 
+    scatter(x, y, .01); 
 
-[x, y] = ijkToAxPos(i,j,k,splits(1),splits(2),splits(3)); % Get position to plot in dendrogram
-figure(12); 
-scatter(x, y, .01); 
-
-%Get minimum amount of text needed to describe a cluster. such a PITA
-%without being able to do names{3}(k){1}, like I can in Python. 
-if k > 0; 
-    tempNames = names{3}; 
-    thisText = tempNames(k); 
-    thisText = thisText{1}; 
-    if loopOptimizePenalty(3); 
-        thisText = [thisText sprintf('%1.2f', penBreakBest) '\newline']; % Only give new line for third depth if doing optimization. Not categories. Too many categories...
+    %Get minimum amount of text needed to describe a cluster. such a PITA
+    %without being able to do names{3}(k){1}, like I can in Python. 
+    if k > 0; 
+        tempNames = names{3}; 
+        thisText = tempNames(k); 
+        thisText = thisText{1}; 
+        if loopOptimizePenalty(3); 
+            thisText = [thisText sprintf('%1.2f', penBreakBest) '\newline']; % Only give new line for third depth if doing optimization. Not categories. Too many categories...
+        end
+    elseif j > 0; 
+        tempNames = names{2}; 
+        thisText = tempNames(j); 
+        thisText = thisText{1}; 
+        if loopOptimizePenalty(2); 
+            thisText = [thisText ' ' sprintf('%1.2f', penBreakBest)]; 
+        end
+        thisText = [thisText '\newline']; % Always give new line for second depth. 
+    else; 
+        tempNames = names{1}; 
+        thisText = tempNames{i}; 
+        thisText = [thisText '\newline']; 
+    %     thisText = thisText{1}; % Not sure why but I need to comment this
+    %     out? 
     end
-elseif j > 0; 
-    tempNames = names{2}; 
-    thisText = tempNames(j); 
-    thisText = thisText{1}; 
-    if loopOptimizePenalty(2); 
-        thisText = [thisText ' ' sprintf('%1.2f', penBreakBest)]; 
-    end
-    thisText = [thisText '\newline']; % Always give new line for second depth. 
-else; 
-    tempNames = names{1}; 
-    thisText = tempNames{i}; 
-    thisText = [thisText '\newline']; 
-%     thisText = thisText{1}; % Not sure why but I need to comment this
-%     out? 
+    % thisText  = sprintf('%s n=%3.0f, P/n=%2.2f', thisText, numdat, penalty/numdat); 
+    thisText = [thisText sprintf('n=%3.0f, P/n=%2.2f',numdat, penalty/numdat)];  % Can't just use sprintf over the whole thing. Else \newline will be erased. How obnoxious. 
+    % thistxt = text(x, y, thisname, 'Rotation', 0, 'HorizontalAlignment', 'center'); 
+    textPlot = text(x, y, thisText, 'Rotation', 37, 'HorizontalAlignment', 'center'); 
 end
-% thisText  = sprintf('%s n=%3.0f, P/n=%2.2f', thisText, numdat, penalty/numdat); 
-thisText = [thisText sprintf('n=%3.0f, P/n=%2.2f',numdat, penalty/numdat)];  % Can't just use sprintf over the whole thing. Else \newline will be erased. How obnoxious. 
-
-% thistxt = text(x, y, thisname, 'Rotation', 0, 'HorizontalAlignment', 'center'); 
-textPlot = text(x, y, thisText, 'Rotation', 37, 'HorizontalAlignment', 'center'); 
-
 %%%
 
 end
@@ -277,6 +278,10 @@ end % end k
 end % end j 
 end % end i
 
+%%% bootstrap like analysis
+
+%
+bootPenalties(bootBools, dat, fnew, penaltyFunction, penaltyTijk); 
 
 
 figure(12); 

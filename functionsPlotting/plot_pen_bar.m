@@ -5,7 +5,8 @@
 lineOrBar = 'bar'; 
 recalcOrder = false; % calculate the order of which variables did best at reducing penalty. 
 
-whichAnalyze = [1, 5, 11]; 
+% whichAnalyze = [1, 5, 11]; 
+whichAnalyze = [1]; 
 
 datCompSpec = {...
     {1,1,'spec'},...

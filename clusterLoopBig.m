@@ -5,6 +5,7 @@ showSpectrograms = false;
 showPenalOptim = false; 
 penaltyFunction = 'spectral_angle'; 
 coh_or_spec = 'spec'; % coherance (coh) or spectra (spec)
+addpath('./boot'); 
 
 datCompSpec = {...
     {1,1,'spec'},...
@@ -26,9 +27,9 @@ labelsAll = {'Water Depth'; 'Plate Bndy Dist'; 'Coastline Dist'; ...
 
 % This chooses which analysis to do. Loop through all analyses, or just do
 % some. 
-eachLayerDepth = [1,3]; 
-eachDatComp = [11]; % [1:size(datCompSpec,2)]; 
-eachQuant = [1:length(labelsAll)];         
+eachLayerDepth = [3]; % [1,3]; 
+eachDatComp = [1]; % [1:size(datCompSpec,2)]; 
+eachQuant = [2]; % [1:length(labelsAll)];         
 savePenaltFile = false; 
         
 for iLayerDepth = eachLayerDepth; % Do layer depths seperately. Easiest coding solution, since single or multiple layer analyses used the same figure windows, and were originally intended to run seperately. 
