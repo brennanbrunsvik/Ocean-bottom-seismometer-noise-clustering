@@ -5,11 +5,12 @@ function [penaltyT, penaltyUnClust] = cluster1LayerHierarchy(sameStasAllAnalyses
 
 
 OBS_TableParams;
-if strcmp(coh_or_spec, 'coh'); 
-    prep_data_coh; 
-else
-    prep_data; 
-end
+prep_data_wrapper; 
+% if strcmp(coh_or_spec, 'coh'); 
+%     prep_data_coh; 
+% else
+%     prep_data; 
+% end
 
 % % OthVarMat has data of this style: 
 % % numeric, continuous, no nan. 

@@ -17,6 +17,7 @@ datCompSpec = {...
     {1,2,'coh'},...
     {1,3,'coh'},...
     {2,1,'coh'},... % Not positive if this is all of them. 
+    {1,23,'spec'}... % Both horizontal 1 and 2. 
     };
 
 labelsAll = {'Water Depth'; 'Plate Bndy Dist'; 'Coastline Dist'; ...
@@ -25,9 +26,9 @@ labelsAll = {'Water Depth'; 'Plate Bndy Dist'; 'Coastline Dist'; ...
 
 % This chooses which analysis to do. Loop through all analyses, or just do
 % some. 
-eachLayerDepth = [3]; % [1,3]; 
-eachDatComp = [1]; % [1:size(datCompSpec,2)]; 
-eachQuant = [4]; % [1:length(labelsAll)];         
+eachLayerDepth = [1,3]; 
+eachDatComp = [11]; % [1:size(datCompSpec,2)]; 
+eachQuant = [1:length(labelsAll)];         
 savePenaltFile = false; 
         
 for iLayerDepth = eachLayerDepth; % Do layer depths seperately. Easiest coding solution, since single or multiple layer analyses used the same figure windows, and were originally intended to run seperately. 
