@@ -2,11 +2,11 @@
 % information. 
 %         
 
-lineOrBar = 'bar'; 
+lineOrBar = 'line'; 
 recalcOrder = false; % calculate the order of which variables did best at reducing penalty. 
 
-% whichAnalyze = [1, 5, 11]; 
-whichAnalyze = [1]; 
+whichAnalyze = [1, 5, 11]; 
+% whichAnalyze = [1]; 
 
 datCompSpec = {...
     {1,1,'spec'},...
@@ -32,6 +32,9 @@ datCompLabels = {'Z', 'H1', 'H2', 'P', ... % Uncorrected spec
 labelsAllUnsort = {'Water Depth'; 'Plate Bndy Dist'; 'Coastline Dist'; ...
             'Crustal Age'; 'Sediment Thickn'; 'Surface Current';...
             'OBS Design'; 'Seismometer'; 'Pressure Guage'; 'Environment'; 'Experiment'}; 
+rmv3Lyr = logical([1 0 0 0 0 0 0 1 0 0 0 ]'); 
+frstLyr = 8; 
+scndLyr = 1; 
         
 datCompSpec = datCompSpec(whichAnalyze); 
 symbolsScatter = symbolsScatter(whichAnalyze); 
@@ -56,6 +59,7 @@ cmap = lines(length(eachDatComp));
 % cmap = colorcube(length(eachDatComp)); 
 
 legPlots = []; % Hold plot handles to add to legend. 
+legPlotsLevel = []; % Hold plot handles to add to legend only showing dashed, dotted, etc. 
 allBar = []; 
 % title('sub-bars are fake for now')
 
@@ -87,9 +91,26 @@ if ~ recalcOrder;
 end
 eachPenalty = eachPenalty(penaltySortPlot); 
 labelsAll = labelsAllUnsort(penaltySortPlot); 
+% rmv3Lyr = rmv3Lyr(penaltySortPlot); 
 
 
 pltLineWidth = 2; 
+
+if iLayerDepth == 3; 
+    % plot 2 deep penalty. 
+    eachPenalty2Deep = finPenData.eachPenalty2Deep; 
+    eachPenalty2Deep = 100-(eachPenalty2Deep ./ penaltyUnClust).*100; 
+    eachPenalty2Deep = eachPenalty2Deep(penaltySortPlot); 
+    plot([1:size(eachPenalty,1)]', eachPenalty2Deep, ...
+        ':', 'linewidth', pltLineWidth.*.9, 'Color', cmap(idatcomp,:)); 
+       
+    scatter(find(rmv3Lyr(penaltySortPlot)), [1 1].* eachPenalty2Deep(scndLyr),...
+        40, cmap(idatcomp,:), 'filled' ); % find where the second layers label is. Make some scatter dots there. 
+    % remove data for the layers which were already accounted for. 
+    eachPenalty(rmv3Lyr(penaltySortPlot)) = nan; % Have to keep the re-ordering rmv3Lyr here, or else it gets reordered 3 times. 
+end
+
+
 
 
 allBar = [allBar, eachPenalty];
@@ -154,10 +175,16 @@ box on;
 grid on; 
 
 if strcmp(lineOrBar, 'line'); 
-    legend(legPlots, datCompLabels, 'location', 'best', 'numColumns', 2)
+    legend(legPlots, datCompLabels, 'location', 'best', 'numColumns', 2)   
+    legend('-DynamicLegend'); 
+    plot([1 1], [0 0], '-k', 'DisplayName', '3-layer'); 
+    plot([1 1], [0 0], ':k', 'DisplayName', 'Seismometer + depth'); 
+    plot([1 1], [0 0], '--k', 'DisplayName', '1-layer'); 
 elseif strcmp(lineOrBar, 'bar'); 
     legend(bar1H, datCompLabels, 'location', 'southwest', 'numColumns', 2); 
 end
+% legend('-DynamicLegend');
+% scatter([0, 0], [0, 0])
 
 exportgraphics(gcf, 'FIGURES/clusteredPenaltiesCompilation.pdf')
 
