@@ -1,12 +1,12 @@
 % clear; 
 % close all; 
 sameStasAllAnalyses = true; 
-showSpectrograms = false; 
+showSpectrograms = true; 
 showPenalOptim = false; 
 penaltyFunction = 'spectral_angle'; 
 coh_or_spec = 'spec'; % coherance (coh) or spectra (spec)
 addpath('./boot'); 
-
+addpath('./functionsPlotting'); 
 datCompSpec = {...
     {1,1,'spec'},... % 1
     {1,2,'spec'},... 
@@ -28,9 +28,9 @@ labelsAll = {'Water Depth'; 'Plate Bndy Dist'; 'Coastline Dist'; ...
 % This chooses which analysis to do. Loop through all analyses, or just do
 % some. 
 eachLayerDepth = [3]; % [1,3]; 
-eachDatComp = [1, 5, 11]; % [1:size(datCompSpec,2)]; 
-eachQuant = [1:length(labelsAll)];         
-savePenaltFile = true; 
+eachDatComp = [1]; % [1, 5, 11]; % [1:size(datCompSpec,2)]; 
+eachQuant = [3]; [1:length(labelsAll)];         
+savePenaltFile = false; 
 
 % parpool(8); 
         

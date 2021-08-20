@@ -3,18 +3,19 @@ function [xCent,yCent, widthIns, heightIns] = ijkToAxPos2(i,j,k, maxi, maxj, max
 y = 0; x = 0; 
 widthIns = 1/(maxi*maxj) ; 
 heightIns = 1/4 ; 
+titleSpace = .15; 
 if i > 0; 
     y = y - 1; 
 end 
 if j > 0; 
     widthIns = widthIns * .5; 
     heightIns = heightIns * .5; 
-    y = y - .8; % 1; 
+    y = y - .8 - titleSpace; % 1; 
 end 
 if k > 0; 
     widthIns = widthIns * .6; %TODO not sure if .6 is a good value here. 
     heightIns = heightIns * .6;
-    y = y - .8/2; % 1; 
+    y = y - .8/2 - titleSpace; % 1; 
 end
 
 posibX = linspace(-.5, .5, maxi); 

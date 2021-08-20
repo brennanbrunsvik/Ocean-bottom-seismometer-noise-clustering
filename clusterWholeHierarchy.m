@@ -200,15 +200,6 @@ else;
 end
 
 if showSpectrograms; 
-    % Inset figures of spectra within dendrogram plot
-    [xInset, yInset, widthIns, heightIns] = ijkToAxPos2(i,j,k,splits(1),splits(2),splits(3)); % Get position to plot in dendrogram
-    figure(134); 
-    axIns = axes('Position', [xInset-.5*widthIns, yInset-.5*heightIns, widthIns, heightIns]); 
-    [~] = cluster_spread(thiscluster, fnew, replace(thisname, '\newline', '|'), axIns, ...
-        showPlot=true, penalty=penaltyFunction, barePlot=true); % Just using this to plot spectra cluster again. 
-    % dendroConnectLines; 
-
-
     [x, y] = ijkToAxPos(i,j,k,splits(1),splits(2),splits(3)); % Get position to plot in dendrogram
     figure(12); 
     scatter(x, y, .01); 
@@ -238,9 +229,21 @@ if showSpectrograms;
     %     out? 
     end
     % thisText  = sprintf('%s n=%3.0f, P/n=%2.2f', thisText, numdat, penalty/numdat); 
-    thisText = [thisText sprintf('n=%3.0f, P/n=%2.2f',numdat, penalty/numdat)];  % Can't just use sprintf over the whole thing. Else \newline will be erased. How obnoxious. 
+    thisText = [thisText sprintf('Pav=%2.2f, n=%3.0f', penalty/numdat, numdat)];  % Can't just use sprintf over the whole thing. Else \newline will be erased. How obnoxious. 
     % thistxt = text(x, y, thisname, 'Rotation', 0, 'HorizontalAlignment', 'center'); 
     textPlot = text(x, y, thisText, 'Rotation', 37, 'HorizontalAlignment', 'center'); 
+    
+    % Inset figures of spectra within dendrogram plot
+    [xInset, yInset, widthIns, heightIns] = ijkToAxPos2(i,j,k,splits(1),splits(2),splits(3)); % Get position to plot in dendrogram
+
+    [xInset, yInset, widthIns, heightIns] = ijkToAxPos3(i,j,k,splits(1),splits(2),splits(3)); % Get position to plot in dendrogram
+    figure(134); 
+    axIns = axes('Position', [xInset-.5*widthIns, yInset-.5*heightIns, widthIns, heightIns]); 
+    [~] = cluster_spread(thiscluster, fnew, replace(thisname, '\newline', '|'), axIns, ...
+        showPlot=true, penalty=penaltyFunction, barePlot=true); % Just using this to plot spectra cluster again. 
+%     textPlot = text(gca, 0.025, 0.975, thisText, 'units', 'normalized', 'verticalalignment', 'top'); 
+    thisTitle = title(thisText, 'FontWeight', 'normal'); 
+    % dendroConnectLines; 
 end
 %%%
 
