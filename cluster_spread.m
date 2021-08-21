@@ -112,10 +112,10 @@ if ~ options.barePlot;
     box on; 
     grid on ;
     title([thistitle sprintf(' - P: %5.1f. P/n: %3.1f', dist, dist / size(dists,1))] ); 
-else;
-%     disp('Do some stuff'); 
-    xticks([]); 
-    yticks([])
+% else;
+% %     disp('Do some stuff'); 
+%     xticks([]); 
+%     yticks([])
 end
 
 

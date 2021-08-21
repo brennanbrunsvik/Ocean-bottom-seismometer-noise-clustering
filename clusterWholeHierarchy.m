@@ -68,7 +68,7 @@ if isCat(iquant);
     end
     namesAdd = cellstr(eachTempDat); 
 else
-    namesAdd = {[cut3 '<'], [cut3 '>=']};
+    namesAdd = {['<'], ['>=']};
     tempDatBools = {"Turn on", "optimization for depth 3"}; 
 end
 
@@ -85,7 +85,7 @@ bools = {... % Data 1
 boolsMult = {}; 
 names = {
     {'Trillium 240', 'Guralp CMG3T 120', 'Trillium Compact'},... % Names 1
-    {'Shallow', 'Deep'},... % Names 2
+    {'<', '>='},... % Names 2
      namesAdd,...%}... % Names 3
     }; 
 
@@ -212,7 +212,7 @@ if showSpectrograms;
         thisText = tempNames(k); 
         thisText = thisText{1}; 
         if loopOptimizePenalty(3); 
-            thisText = [thisText sprintf('%1.2f', penBreakBest) '\newline']; % Only give new line for third depth if doing optimization. Not categories. Too many categories...
+            thisText = [thisText sprintf('%1.2f', penBreakBest) newline]; % Only give new line for third depth if doing optimization. Not categories. Too many categories...
         end
     elseif j > 0; 
         tempNames = names{2}; 
@@ -221,16 +221,16 @@ if showSpectrograms;
         if loopOptimizePenalty(2); 
             thisText = [thisText ' ' sprintf('%1.2f', penBreakBest)]; 
         end
-        thisText = [thisText '\newline']; % Always give new line for second depth. 
+        thisText = [thisText newline]; % Always give new line for second depth. 
     else; 
         tempNames = names{1}; 
         thisText = tempNames{i}; 
-        thisText = [thisText '\newline']; 
+        thisText = [thisText newline]; 
     %     thisText = thisText{1}; % Not sure why but I need to comment this
     %     out? 
     end
     % thisText  = sprintf('%s n=%3.0f, P/n=%2.2f', thisText, numdat, penalty/numdat); 
-    thisText = [thisText sprintf('Pav=%2.2f, n=%3.0f', penalty/numdat, numdat)];  % Can't just use sprintf over the whole thing. Else \newline will be erased. How obnoxious. 
+    thisText = [thisText sprintf(['Pav=%1.0f' newline 'n=%1.0f'], penalty/numdat, numdat)];  % Can't just use sprintf over the whole thing. Else \newline will be erased. How obnoxious. 
     % thistxt = text(x, y, thisname, 'Rotation', 0, 'HorizontalAlignment', 'center'); 
     textPlot = text(x, y, thisText, 'Rotation', 37, 'HorizontalAlignment', 'center'); 
     
@@ -240,9 +240,33 @@ if showSpectrograms;
     axIns = axes('Position', [xInset-.5*widthIns, yInset-.5*heightIns, widthIns, heightIns]); 
     [~] = cluster_spread(thiscluster, fnew, replace(thisname, '\newline', '|'), axIns, ...
         showPlot=true, penalty=penaltyFunction, barePlot=true); % Just using this to plot spectra cluster again. 
-%     textPlot = text(gca, 0.025, 0.975, thisText, 'units', 'normalized', 'verticalalignment', 'top'); 
+    if (j<1) & (k<1); 
+        grid on; 
+        if i > 1; 
+            xticklabels([]); yticklabels([]); 
+%             thisMinX = xlim(); 
+%             thisMinX = thisMinX(1); 
+%             text(thisMinX + diff(xlim()) * .02, ...
+%                 mean(ylim()), 'dB'); 
+        else; 
+            xticklabels([]); 
+        end
+        if i == 2; % Add frequency labels, inside plot and not beneath
+            thisMinY = ylim(); 
+            thisMinY = thisMinY(1); 
+            text([0.01, 0.1],...
+                [thisMinY, thisMinY] + diff(ylim())/20,...
+                {'0.01 Hz', '0.1 Hz'}, ...
+                'horizontalAlignment', 'center'); 
+        end
+    else; 
+        xticks([]); yticks([]); 
+    end
+    %     textPlot = text(gca, 0.025, 0.975, thisText, 'units', 'normalized', 'verticalalignment', 'top'); 
     thisTitle = title(thisText, 'FontWeight', 'normal'); 
     dendroConnectLines(ax134, i, j, k, splits); 
+    % Only modify the top level plots of 134 to add labels and stuff. 
+    
 end
 %%%
 
@@ -316,15 +340,15 @@ if showSpectrograms; % show spectrograms sort of morphed into plot anything.
     predDiff = diff([0, pred1, pred2, pred3]); % Show gain in reduction from previous level
     [~, yTxt, ~, ~] = ijkToAxPos3(1,0,0,splits(1),splits(2),splits(3)); % Get position to plot things on left   
     text(xTxt, yTxt, ...
-        [sprintf('%s\nP = %1.0f\nPred = %1.0f', cut1, penaltyTi, predDiff(1)) '%'],...
+        [sprintf('%s\nPtot = %1.0f\nPred = %1.0f', cut1, penaltyTi, predDiff(1)) '%'],...
         'HorizontalAlignment', 'center'); 
     [~, yTxt, ~, ~] = ijkToAxPos3(1,1,0,splits(1),splits(2),splits(3)); 
     text(xTxt, yTxt, ...
-        [sprintf('%s\nP = %1.0f\nPred = %1.0f', cut2, penaltyTij, predDiff(2)) '%'],...
+        [sprintf('%s\nPtot = %1.0f\nPred = %1.0f', cut2, penaltyTij, predDiff(2)) '%'],...
         'HorizontalAlignment', 'center'); 
     [~, yTxt, ~, ~] = ijkToAxPos3(1,1,1,splits(1),splits(2),splits(3)); 
     text(xTxt, yTxt, ...
-        [sprintf('%s\nP = %1.0f\nPred = %1.0f', cut3, penaltyTijk, predDiff(3)) '%'],...
+        [sprintf('%s\nPtot = %1.0f\nPred = %1.0f', cut3, penaltyTijk, predDiff(3)) '%'],...
         'HorizontalAlignment', 'center'); 
     
     uistack(ax134, 'bottom');
@@ -333,7 +357,8 @@ if showSpectrograms; % show spectrograms sort of morphed into plot anything.
     textFig = sprintf('%s_Datswitch%1.0f_Comp%1.0f-%s-%s-%s', coh_or_spec, datswitch, component, cut1, cut2, cut3);  
     exportgraphics(figure(12), sprintf('Figures/dendrogram__%s.pdf', textFig)); 
     exportgraphics(figure(132),sprintf('Figures/manual_sep/combined__%s.pdf', textFig));
-    exportgraphics(figure(134), sprintf('Figures/dendrogram_spec__%s.pdf', textFig)); 
+    exportgraphics(figure(134), sprintf('Figures/dendrogram_spec__%s.pdf', textFig),...
+        'contentType', 'vector'); 
 
 end 
 
