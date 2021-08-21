@@ -309,7 +309,27 @@ if showSpectrograms; % show spectrograms sort of morphed into plot anything.
 
 
     axes(ax134); % Dendrogram + spectrogram figure 
+    xTxt = 0.04 
+    pred1 = (1-penaltyTi  /penaltyUnClust)*100; 
     pred2 = (1-penaltyTij /penaltyUnClust)*100; 
+    pred3 = (1-penaltyTijk/penaltyUnClust)*100; 
+    predDiff = diff([0, pred1, pred2, pred3]); % Show gain in reduction from previous level
+    [~, yTxt, ~, ~] = ijkToAxPos3(1,0,0,splits(1),splits(2),splits(3)); % Get position to plot things on left   
+    text(xTxt, yTxt, ...
+        [sprintf('%s\nP = %1.0f\nPred = %1.0f', cut1, penaltyTi, predDiff(1)) '%'],...
+        'HorizontalAlignment', 'center'); 
+    [~, yTxt, ~, ~] = ijkToAxPos3(1,1,0,splits(1),splits(2),splits(3)); 
+    text(xTxt, yTxt, ...
+        [sprintf('%s\nP = %1.0f\nPred = %1.0f', cut2, penaltyTij, predDiff(2)) '%'],...
+        'HorizontalAlignment', 'center'); 
+    [~, yTxt, ~, ~] = ijkToAxPos3(1,1,1,splits(1),splits(2),splits(3)); 
+    text(xTxt, yTxt, ...
+        [sprintf('%s\nP = %1.0f\nPred = %1.0f', cut3, penaltyTijk, predDiff(3)) '%'],...
+        'HorizontalAlignment', 'center'); 
+    
+    uistack(ax134, 'bottom');
+
+    % Save all the figs. 
     textFig = sprintf('%s_Datswitch%1.0f_Comp%1.0f-%s-%s-%s', coh_or_spec, datswitch, component, cut1, cut2, cut3);  
     exportgraphics(figure(12), sprintf('Figures/dendrogram__%s.pdf', textFig)); 
     exportgraphics(figure(132),sprintf('Figures/manual_sep/combined__%s.pdf', textFig));
