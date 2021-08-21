@@ -7,6 +7,8 @@ penaltyFunction = 'spectral_angle';
 coh_or_spec = 'spec'; % coherance (coh) or spectra (spec)
 addpath('./boot'); 
 addpath('./functionsPlotting'); 
+addpath('./otherPplCode'); 
+
 datCompSpec = {...
     {1,1,'spec'},... % 1
     {1,2,'spec'},... 

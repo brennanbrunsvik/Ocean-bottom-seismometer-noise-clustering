@@ -122,9 +122,10 @@ if showSpectrograms;
 figure(2); clf; set(gcf, 'pos', [2731 1103 496 401]); 
 figure(12); clf; hold on; set(gcf, 'pos', [1601 1609 1846 388]); % Dendrogram figure
 figure(132); clf; hold on; set(gcf, 'pos', [2017 342 2767 1656]); % Figure to hold a bunch of spectra and other things
-figure(134); clf; hold on; set(gcf, 'pos', [-1196 357 953 646]); % Experimental figure to combine dendrogram and spectra plots. 
+figure(134); clf; hold on; set(gcf, 'pos', [-1196 247 931 931]); % Experimental figure to combine dendrogram and spectra plots. 
 ax134 = gca(); 
-xlim([0, 1]); ylim([0,1]); 
+set(ax134, 'Units','Normalize','Position',[0 0 1 1]); % Make it so figure coordinates and data coordinates are the same. 
+xlim([0, 1]); ylim([0, 1]); 
 axis off;
 end
 pltn = 5; pltm = 7; % rows by collumns of main plot
@@ -233,17 +234,15 @@ if showSpectrograms;
     % thistxt = text(x, y, thisname, 'Rotation', 0, 'HorizontalAlignment', 'center'); 
     textPlot = text(x, y, thisText, 'Rotation', 37, 'HorizontalAlignment', 'center'); 
     
-    % Inset figures of spectra within dendrogram plot
-    [xInset, yInset, widthIns, heightIns] = ijkToAxPos2(i,j,k,splits(1),splits(2),splits(3)); % Get position to plot in dendrogram
-
+    figure(134); % Dendrogram + spectrogram figure
     [xInset, yInset, widthIns, heightIns] = ijkToAxPos3(i,j,k,splits(1),splits(2),splits(3)); % Get position to plot in dendrogram
-    figure(134); 
+     
     axIns = axes('Position', [xInset-.5*widthIns, yInset-.5*heightIns, widthIns, heightIns]); 
     [~] = cluster_spread(thiscluster, fnew, replace(thisname, '\newline', '|'), axIns, ...
         showPlot=true, penalty=penaltyFunction, barePlot=true); % Just using this to plot spectra cluster again. 
 %     textPlot = text(gca, 0.025, 0.975, thisText, 'units', 'normalized', 'verticalalignment', 'top'); 
     thisTitle = title(thisText, 'FontWeight', 'normal'); 
-    % dendroConnectLines; 
+    dendroConnectLines(ax134, i, j, k, splits); 
 end
 %%%
 
@@ -308,10 +307,14 @@ if showSpectrograms; % show spectrograms sort of morphed into plot anything.
     % xlim([-.275, .275]); 
     xlim([-1, 1]); 
 
+
+    axes(ax134); % Dendrogram + spectrogram figure 
+    pred2 = (1-penaltyTij /penaltyUnClust)*100; 
     textFig = sprintf('%s_Datswitch%1.0f_Comp%1.0f-%s-%s-%s', coh_or_spec, datswitch, component, cut1, cut2, cut3);  
     exportgraphics(figure(12), sprintf('Figures/dendrogram__%s.pdf', textFig)); 
     exportgraphics(figure(132),sprintf('Figures/manual_sep/combined__%s.pdf', textFig));
     exportgraphics(figure(134), sprintf('Figures/dendrogram_spec__%s.pdf', textFig)); 
+
 end 
 
 end

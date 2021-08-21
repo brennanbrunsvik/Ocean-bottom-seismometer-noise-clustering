@@ -45,9 +45,11 @@ function [xCent,yCent, widthIns, heightIns] = ijkToAxPos3(i,j,k, maxi, maxj, max
 % Create positions that are equally spaced with a buffer on both sides of
 % each axis inset. Spreads from 0 to 1. 
 
-textSpace = 0.05; 
+lBord = 0.1; 
+rBord = 0.9; 
+textSpace = 0.1; 
 
-[posi, posiLeft, widthi, widthiTot] = arrangeSubplots(maxi); 
+[posi, posiLeft, widthi, widthiTot] = arrangeSubplots(maxi);
 [posj, posjLeft, widthj, widthjTot] = arrangeSubplots(maxj); 
 [posk, posKLeft, widthk, widthkTot] = arrangeSubplots(maxk); 
 
@@ -81,6 +83,11 @@ yCent = posY;
 xCent = posF; 
 widthIns = widthF; 
 heightIns = widthIns; 
+
+yCent = yCent .* (rBord-lBord) + lBord;
+xCent = xCent .* (rBord-lBord) + lBord;
+widthIns = widthIns .* (rBord-lBord);
+heightIns = heightIns .* (rBord-lBord); 
 
 
 end
