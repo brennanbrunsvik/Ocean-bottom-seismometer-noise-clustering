@@ -46,10 +46,10 @@ eachDatComp = [1:size(datCompSpec,2)];
 eachQuant = [1:length(labelsAll)];  
         
 figure(70); clf; set(gcf, 'pos', [-1269 495 567 477]); hold on; 
-% cmap = jet(length(eachDatComp));
-% cmap = hsv(length(eachDatComp)); 
-% cmap = lines(length(eachDatComp)); 
-cmap = colorcube(length(eachDatComp)); 
+% cmap = jet(length(labelsAll));
+% cmap = hsv(length(labelsAll)); 
+% cmap = lines(length(labelsAll)); 
+cmap = colorcube(length(labelsAll)); 
 
 legPlots = []; % Hold plot handles to add to legend. 
 allBar = []; 
@@ -91,7 +91,7 @@ eachPenalty3 = 100 - eachPenalty3; % Converting to penalty reduction
 
 
 scatterDatComp = scatter(eachPenalty1, eachPenalty3, ...
-    90, [1:length(eachPenalty3)], symbolsScatter{idatcomp}, 'linewidth', 10 ); 
+    90, cmap(:,:), symbolsScatter{idatcomp}, 'linewidth', 2 ); 
 
 
 
@@ -156,7 +156,7 @@ plot([0 100], [0 100], '-k')
 
 legPlots = []; 
 for ivar = [1:length(eachPenalty3)]; 
-    legPlots(end+1) = scatter([-999, -999], [-999, -999], 90, [ivar, ivar], 'o', 'filled'); 
+    legPlots(end+1) = scatter([-999, -999], [-999, -999], 90, cmap(ivar, :), 'o', 'filled'); 
 end
 for ivar = [1:length(eachDatComp)]; 
     legPlots(end+1) = scatter([-999, -999], [-999, -999], 90, 'k', symbolsScatter{ivar}); 

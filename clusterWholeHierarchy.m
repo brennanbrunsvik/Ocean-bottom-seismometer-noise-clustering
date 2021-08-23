@@ -230,7 +230,7 @@ if showSpectrograms;
     %     out? 
     end
     % thisText  = sprintf('%s n=%3.0f, P/n=%2.2f', thisText, numdat, penalty/numdat); 
-    thisText = [thisText sprintf(['Pav=%1.0f' newline 'n=%1.0f'], penalty/numdat, numdat)];  % Can't just use sprintf over the whole thing. Else \newline will be erased. How obnoxious. 
+    thisText = [thisText sprintf(['Pav=%1.1f' newline 'n=%1.0f'], penalty/numdat, numdat)];  % Can't just use sprintf over the whole thing. Else \newline will be erased. How obnoxious. 
     % thistxt = text(x, y, thisname, 'Rotation', 0, 'HorizontalAlignment', 'center'); 
     textPlot = text(x, y, thisText, 'Rotation', 37, 'HorizontalAlignment', 'center'); 
     
