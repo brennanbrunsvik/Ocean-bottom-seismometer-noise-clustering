@@ -81,7 +81,7 @@ for idatcomp = eachDatComp; % Loop through all combinations of datswitcs, seismo
 
     penaltySortPlot = [1:length(eachPenalty)]'; 
     if ~ recalcOrder; 
-        load('penaltySortPlot.mat'); 
+        load(['penaltySortPlotDepth' num2str(iLayerDepth) '.mat']); 
     end
     eachPenalty = eachPenalty(penaltySortPlot); 
     labelsAll = labelsAllUnsort(penaltySortPlot); 
@@ -92,12 +92,13 @@ for idatcomp = eachDatComp; % Loop through all combinations of datswitcs, seismo
         eachPenalty2Deep = finPenData.eachPenalty2Deep; 
         eachPenalty2Deep = 100-(eachPenalty2Deep ./ penaltyUnClust).*100; 
         eachPenalty2Deep = eachPenalty2Deep(penaltySortPlot); 
+        eachPenalty(rmv3Lyr(penaltySortPlot)) = nan; % Have to keep the re-ordering rmv3Lyr here, or else it gets reordered 3 times. 
+        eachPenalty2Deep(isnan(eachPenalty)) = nan; % Don't plot 2 deep penalty where we don't have 3 deep penalty. 
         plot([1:size(eachPenalty,1)]', eachPenalty2Deep, ...
             ':', 'linewidth', pltLineWidth.*.9, 'Color', cmap(idatcomp,:)); 
 
     %     scatter(find(rmv3Lyr(penaltySortPlot)), [1 1].* eachPenalty2Deep(scndLyr),...
     %         40, cmap(idatcomp,:), 'filled' ); % find where the second layers label is. Make some scatter dots there. 
-        eachPenalty(rmv3Lyr(penaltySortPlot)) = nan; % Have to keep the re-ordering rmv3Lyr here, or else it gets reordered 3 times. 
     end
 
 
@@ -141,11 +142,17 @@ end % End each dat comp
 
 % calculate the best order to plot penalties, from most reduction to least
 % left to right. 
-if (iLayerDepth == 1) && all(penaltySortPlot == [1:length(penaltySortPlot)]'); % Don't calculate the new order if you were already re-ordering things!!!
+% if (iLayerDepth == 1) && all(penaltySortPlot == [1:length(penaltySortPlot)]'); % Don't calculate the new order if you were already re-ordering things!!!
+%     meanPen = mean(allBar, 2); 
+%     [~,penaltySortPlot] = sort(meanPen);
+%     penaltySortPlot = penaltySortPlot(end:-1:1); 
+%     save('penaltySortPlot.mat', 'penaltySortPlot'); 
+% end % end sorting
+if all(penaltySortPlot == [1:length(penaltySortPlot)]'); % Don't calculate the new order if you were already re-ordering things!!!
     meanPen = mean(allBar, 2); 
     [~,penaltySortPlot] = sort(meanPen);
     penaltySortPlot = penaltySortPlot(end:-1:1); 
-    save('penaltySortPlot.mat', 'penaltySortPlot'); 
+    save(['penaltySortPlotDepth' num2str(iLayerDepth) '.mat'], 'penaltySortPlot'); 
 end % end sorting
 
 %%% Bar plot
@@ -165,7 +172,7 @@ ylim([0 40 ]);
 % if iLayerDepth ~= eachLayerDepth(end); 
 %     set(gca, 'xticklabel', []); 
 % else 
-    set(gca, 'xticklabel', labelsAll, 'XTickLabelRotation', 25,'XTick', [1: length(labelsAll)]); 
+    set(gca, 'xticklabel', labelsAll(~isnan(eachPenalty)), 'XTickLabelRotation', 25,'XTick', find(~isnan(eachPenalty) )); % find(~isnan(eachpenalty)) gives positions ofticks to label. It excludes ones where we have a nan penalty.  
     % for itxt = [1:length(labelsAll)]; 
     %     textH = text(itxt, miny-1, [labelsAll{itxt} '   '] ,...
     %         'Rotation', 45, 'HorizontalAlignment', 'right'); 
@@ -178,6 +185,7 @@ ylabel('Penalty reduction (%)');
 box on; 
 grid on; 
 title(sprintf('%1.0f-Layer Hierarchy', iLayerDepth), 'fontweight', 'normal'); 
+xlim([min(find(~isnan(eachPenalty))), max(find(~isnan(eachPenalty)))]); 
 
 
 end % End main plotting loop
