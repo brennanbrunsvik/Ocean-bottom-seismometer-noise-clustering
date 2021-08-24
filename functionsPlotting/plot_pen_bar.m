@@ -46,7 +46,7 @@ eachLayerDepth = [3,1]; % plot 3 layer deep first, since penalties are lower, an
 eachDatComp = [1:size(datCompSpec,2)]; 
 eachQuant = [1:length(labelsAllUnsort)];  
         
-figure(70); clf; set(gcf, 'pos', [-1273 1261 432 483]); hold on; 
+figure(70); clf; set(gcf, 'pos', [-1273 1261 400 480]); hold on; 
 t = tiledlayout(2,1,'TileSpacing','compact','Padding','compact');
 % cmap = jet(length(eachDatComp));
 % cmap = hsv(length(eachDatComp)); 
@@ -95,7 +95,7 @@ for idatcomp = eachDatComp; % Loop through all combinations of datswitcs, seismo
         eachPenalty(rmv3Lyr(penaltySortPlot)) = nan; % Have to keep the re-ordering rmv3Lyr here, or else it gets reordered 3 times. 
         eachPenalty2Deep(isnan(eachPenalty)) = nan; % Don't plot 2 deep penalty where we don't have 3 deep penalty. 
         plot([1:size(eachPenalty,1)]', eachPenalty2Deep, ...
-            ':', 'linewidth', pltLineWidth.*.9, 'Color', cmap(idatcomp,:)); 
+            '-', 'linewidth', 0.75, 'Color', cmap(idatcomp,:)); 
 
     %     scatter(find(rmv3Lyr(penaltySortPlot)), [1 1].* eachPenalty2Deep(scndLyr),...
     %         40, cmap(idatcomp,:), 'filled' ); % find where the second layers label is. Make some scatter dots there. 
@@ -109,12 +109,14 @@ for idatcomp = eachDatComp; % Loop through all combinations of datswitcs, seismo
     %% Line plots
     if strcmp(lineOrBar, 'line'); 
         if iLayerDepth == 1; 
-            nothing = plot([1:size(eachPenalty,1)]', eachPenalty, ...
-                '-', 'linewidth', .1, 'Color', cmap(idatcomp,:)); % Line connecting dots. Not totally necessary. 
+%             nothing = plot([1:size(eachPenalty,1)]', eachPenalty, ...
+%                 '-', 'linewidth', .25, 'Color', cmap(idatcomp,:)); % Line connecting dots. Not totally necessary. 
+%             scat1 = scatter([1:size(eachPenalty,1)]', eachPenalty, 100, cmap(idatcomp,:), 'Marker', '+', 'LineWidth', 3); 
+%             scat1 = scatter([1:size(eachPenalty,1)]', eachPenalty, 100, cmap(idatcomp,:), 'Marker', 'o', 'LineWidth', 3); 
             scat1 = scatter([1:size(eachPenalty,1)]', eachPenalty, 60, cmap(idatcomp,:), 'filled'); 
         elseif iLayerDepth ==3
-            nothing = plot([1:size(eachPenalty,1)]', eachPenalty, ...
-                '-', 'linewidth', .1, 'Color', cmap(idatcomp,:)); 
+%             nothing = plot([1:size(eachPenalty,1)]', eachPenalty, ...
+%                 '-', 'linewidth', .25, 'Color', cmap(idatcomp,:)); 
             scat3 = scatter([1:size(eachPenalty,1)]', eachPenalty, 60, cmap(idatcomp,:), 'filled'); 
             legPlots(idatcomp) = scat3; 
         end
@@ -124,7 +126,7 @@ for idatcomp = eachDatComp; % Loop through all combinations of datswitcs, seismo
 
     if strcmp(lineOrBar, 'line'); 
         if iLayerDepth == 3; 
-            legPlotsExtend = [legPlots, plot([1 1], [0 0], '--k', 'DisplayName', '1-layer')]; 
+            legPlotsExtend = [legPlots, plot([1 1], [0 0], '-k', 'DisplayName', '1-layer')]; 
             datCompLabelsExtend = datCompLabels; 
             datCompLabelsExtend{end+1} = ['Seismometer+depth']; 
             LGD = legend(legPlotsExtend, datCompLabelsExtend, 'location', 'best', 'numColumns', 2); 
