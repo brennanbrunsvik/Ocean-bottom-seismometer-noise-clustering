@@ -9,6 +9,7 @@ function dist = cluster_spread(clst, fnew, thistitle, thisax, options);
         options.penalty = 'euclidean'
         options.ampLim = 1; % 1 for OBS data. 2 for coherance. 
         options.barePlot = false; 
+        options.addColorbar = false; 
     end
 % if length(varargin) > 0; 
 %     showPlot = varargin{1}; 
@@ -82,7 +83,10 @@ axes(thisax);
 semilogx(fnew, meanSpec, 'k'); % Actually just plotting thise here to set x log. 
 hold on; 
 
-vmin = min(dists); vmax = max(dists); cm = colormap(parula(255)); 
+% vmin = min(dists); vmax = max(dists); 
+vmin = 2; vmax = 7; % Manually setting colors. Should make a function argument. 
+cm = colormap(parula(10));
+
 if length(dists) > 2; 
     colors = colour_get(dists, vmax, vmin, cm); 
 elseif length(dists) <= 2; 
@@ -107,8 +111,10 @@ for ispec = [1:length(dists)];
 end
 
 semilogx(fnew, meanSpec, 'k', 'linewidth', 3); % Actually just plotting thise here to set x log. 
+grid on ;
 if ~ options.barePlot; 
-    cbar = colorbar(); 
+%     cbar = colorbar(); 
+    options.addColorbar = true; 
     box on; 
     grid on ;
     title([thistitle sprintf(' - P: %5.1f. P/n: %3.1f', dist, dist / size(dists,1))] ); 
@@ -118,7 +124,21 @@ if ~ options.barePlot;
 %     yticks([])
 end
 
-
+if options.addColorbar; 
+    disp('do stuf'); 
+    thisCBar = colorbar('north')
+    cBarPos = thisCBar.Position; 
+    cBarPos(1) = cBarPos(1) + 0.3 * cBarPos(3); 
+    cBarPos(3) = .7 * cBarPos(3); 
+    set(thisCBar, 'Position', cBarPos);
+    caxis([vmin, vmax])
+    
+    newTickLabels = thisCBar.TickLabels; 
+    for ilabel = [1:length(newTickLabels)]; 
+            newTickLabels{ilabel} = [newTickLabels{ilabel} '\circ']; 
+    end
+    thisCBar.TickLabels = newTickLabels; 
+end
 
 % dist = RMSdist; 
 % end

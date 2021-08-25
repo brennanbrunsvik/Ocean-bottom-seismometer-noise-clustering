@@ -47,7 +47,7 @@ function [xCent,yCent, widthIns, heightIns] = ijkToAxPos3(i,j,k, maxi, maxj, max
 
 lBord = 0.1;
 rBord = 0.9;
-textSpace = 0.08; 
+textSpace = 0.038; 
 
 [posi, posiLeft, widthi, widthiTot] = arrangeSubplots(maxi);
 [posj, posjLeft, widthj, widthjTot] = arrangeSubplots(maxj);

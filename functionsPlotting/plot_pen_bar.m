@@ -42,7 +42,7 @@ datCompLabels = datCompLabels(whichAnalyze);
 
 % This chooses which analysis to do. Loop through all analyses, or just do
 % some. 
-eachLayerDepth = [3,1]; % plot 3 layer deep first, since penalties are lower, and bars goes beneath 1 layer deep
+eachLayerDepth = [1,3]; % plot 3 layer deep first, since penalties are lower, and bars goes beneath 1 layer deep
 eachDatComp = [1:size(datCompSpec,2)]; 
 eachQuant = [1:length(labelsAllUnsort)];  
         
@@ -78,7 +78,7 @@ for idatcomp = eachDatComp; % Loop through all combinations of datswitcs, seismo
     eachPenalty = finPenData.eachPenalty; 
     eachPenalty = eachPenalty ./ penaltyUnClust .* 100; % normalize penalties to what it would be if they were not clustered
     eachPenalty = 100 - eachPenalty; % Converting to penalty reduction
-
+    
     penaltySortPlot = [1:length(eachPenalty)]'; 
     if ~ recalcOrder; 
         load(['penaltySortPlotDepth' num2str(iLayerDepth) '.mat']); 
@@ -168,7 +168,7 @@ end
 % End bar plot options
 
 % Remaining plotting options
-ylim([0 40 ]); 
+ylim([0 40 ]);  
 
 % x labels
 % if iLayerDepth ~= eachLayerDepth(end); 
@@ -189,6 +189,12 @@ grid on;
 title(sprintf('%1.0f-Layer Hierarchy', iLayerDepth), 'fontweight', 'normal'); 
 xlim([min(find(~isnan(eachPenalty))), max(find(~isnan(eachPenalty)))]); 
 
+% label plots a and b for paper. 
+plotLabels = {'(a)', '(b)'}; 
+text(0.98, 0.96, plotLabels{indLayerDepth}, ...
+    'fontsize', 12,...
+    'units', 'normalized', ...
+    'horizontalalignment', 'right', 'verticalalignment', 'top'); 
 
 end % End main plotting loop
 

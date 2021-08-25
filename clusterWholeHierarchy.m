@@ -212,14 +212,14 @@ if showSpectrograms;
         thisText = tempNames(k); 
         thisText = thisText{1}; 
         if loopOptimizePenalty(3); 
-            thisText = [thisText sprintf('%1.2f', penBreakBest) newline]; % Only give new line for third depth if doing optimization. Not categories. Too many categories...
+            thisText = [thisText sprintf('%1.0f', penBreakBest) newline]; % Only give new line for third depth if doing optimization. Not categories. Too many categories...
         end
     elseif j > 0; 
         tempNames = names{2}; 
         thisText = tempNames(j); 
         thisText = thisText{1}; 
         if loopOptimizePenalty(2); 
-            thisText = [thisText ' ' sprintf('%1.2f', penBreakBest)]; 
+            thisText = [thisText ' ' sprintf('%1.0f', penBreakBest)]; 
         end
         thisText = [thisText newline]; % Always give new line for second depth. 
     else; 
@@ -229,19 +229,44 @@ if showSpectrograms;
     %     thisText = thisText{1}; % Not sure why but I need to comment this
     %     out? 
     end
+    thisTextSplitDend = strrep(thisText, newline, ''); % Hopefully use this to indicate where splitting in dendrogram. 
     % thisText  = sprintf('%s n=%3.0f, P/n=%2.2f', thisText, numdat, penalty/numdat); 
     thisText = [thisText sprintf(['Pav=%1.1f' newline 'n=%1.0f'], penalty/numdat, numdat)];  % Can't just use sprintf over the whole thing. Else \newline will be erased. How obnoxious. 
     % thistxt = text(x, y, thisname, 'Rotation', 0, 'HorizontalAlignment', 'center'); 
     textPlot = text(x, y, thisText, 'Rotation', 37, 'HorizontalAlignment', 'center'); 
     
     figure(134); % Dendrogram + spectrogram figure
+    axes(ax134); 
     [xInset, yInset, widthIns, heightIns] = ijkToAxPos3(i,j,k,splits(1),splits(2),splits(3)); % Get position to plot in dendrogram
-     
-    axIns = axes('Position', [xInset-.5*widthIns, yInset-.5*heightIns, widthIns, heightIns]); 
+    textSpaceDendro = 0.025; 
+    yDivDendro = dendroConnectLines(ax134, i, j, k, splits, textSpaceDendro); % connect dendro lines. Find breaking point in lines. 
+    text(xInset, yDivDendro, thisTextSplitDend, ...
+        'verticalalignment', 'bottom', 'horizontalalignment', 'center'); 
+    
+    axIns = axes('Position', [xInset-.5*widthIns, yInset-.5*heightIns, widthIns, heightIns]);
+    axes(axIns)
+    if (i == 1) & (j == 0) & (k == 0); 
+        addColorbar = true; 
+    else; 
+        addColorbar = false; 
+    end
     [~] = cluster_spread(thiscluster, fnew, replace(thisname, '\newline', '|'), axIns, ...
-        showPlot=true, penalty=penaltyFunction, barePlot=true); % Just using this to plot spectra cluster again. 
+        showPlot=true, penalty=penaltyFunction, barePlot=true, addColorbar=addColorbar); % Just using this to plot spectra cluster again. 
+    axes(axIns); 
+    text(0.03, 0.97, sprintf('Pav=%1.1f', penalty/numdat), ...
+        'horizontalAlignment', 'left', 'verticalAlignment', 'top',...
+        'units', 'normalized'); 
+    text(0.97, 0.03, sprintf('n=%1.0f',numdat), ...
+        'horizontalAlignment', 'right', 'verticalAlignment', 'bottom',...
+        'units', 'normalized')
+%     title(thisTextSplitDend); 
     if (j<1) & (k<1); 
-        grid on; 
+        % Customize first hierarchy level ticks and grid
+        grid on; % Turn on only major grid
+        axIns.XTickMode = 'manual'; 
+        axIns.XTick = [0.001 0.01, 0.1 1]; % Positions of major ticks
+        axIns.TickLength = 2 .* [0.01, 0.025];    
+        axIns.YMinorTick = 'on'
         if i > 1; 
             xticklabels([]); yticklabels([]); 
 %             thisMinX = xlim(); 
@@ -250,8 +275,16 @@ if showSpectrograms;
 %                 mean(ylim()), 'dB'); 
         else; 
             xticklabels([]); 
+%             thisCBar = colorbar('north')
+%             cBarPos = thisCBar.Position; 
+%             cBarPos(1) = cBarPos(1) + 0.3 * cBarPos(3); 
+%             cBarPos(3) = .7 * cBarPos(3); 
+%             set(thisCBar, 'Position', cBarPos); 
+%             colorbar('north'); 
+%             axCBar = axes('Position', [0, 0, .1, .1])
+%             colorbar(axCBar)
         end
-        if i == 2; % Add frequency labels, inside plot and not beneath
+        if i == 1; % Add frequency labels, inside plot and not beneath
             thisMinY = ylim(); 
             thisMinY = thisMinY(1); 
             text([0.01, 0.1],...
@@ -259,12 +292,28 @@ if showSpectrograms;
                 {'0.01 Hz', '0.1 Hz'}, ...
                 'horizontalAlignment', 'center'); 
         end
-    else; 
-        xticks([]); yticks([]); 
+    elseif (k<1) & (j>0); 
+        % For second hierarchy layer, have to really customize ticks and
+        % grid. 
+        grid off; % Turn off whole grid
+        grid on; % Turn on only major grid. 
+        axIns.XTickMode = 'manual'; 
+        axIns.XTick = [0.001 0.01, 0.1 1]; 
+        axIns.TickLength = 3.5 .* [0.01, 0.025]; 
+        axIns.YMinorTick = 'on'
+        xticklabels([]); yticklabels([]); 
+    elseif k>0; 
+        grid off; 
+        axIns.XTickMode = 'manual'; 
+        axIns.XTick = [0.001 0.01, 0.1 1]; 
+        axIns.TickLength = 4.5 .* [0.01, 0.025]; 
+%         axIns.XMinorTick = 'off'; 
+        xticklabels([]); yticklabels([]); 
+        
+%         xticks([]); yticks([]); 
     end
     %     textPlot = text(gca, 0.025, 0.975, thisText, 'units', 'normalized', 'verticalalignment', 'top'); 
-    thisTitle = title(thisText, 'FontWeight', 'normal'); 
-    dendroConnectLines(ax134, i, j, k, splits); 
+%     thisTitle = title(thisText, 'FontWeight', 'normal'); 
     % Only modify the top level plots of 134 to add labels and stuff. 
     
 end
