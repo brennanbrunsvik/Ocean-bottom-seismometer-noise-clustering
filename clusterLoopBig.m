@@ -2,7 +2,7 @@
 % close all; 
 sameStasAllAnalyses = true; 
 showSpectrograms = true; 
-showPenalOptim = false; 
+showPenalOptim = logical([0 1 0]); % 
 penaltyFunction = 'spectral_angle'; 
 coh_or_spec = 'spec'; % coherance (coh) or spectra (spec)
 addpath('./boot'); 
@@ -25,7 +25,7 @@ datCompSpec = {...
 
 labelsAll = {'Water Depth'; 'Plate Bndy Dist'; 'Coastline Dist'; ...
             'Crustal Age'; 'Sediment Thickn'; 'Surface Current';...
-            'OBS Design'; 'Seismometer'; 'Pressure Guage'; 'Environment'; 'Experiment'}; % Should be able to remove this from here, but I was using it for size(...)
+            'OBS Design'; 'Seismometer'; 'Pressure Gauge'; 'Environment'; 'Experiment'}; % Should be able to remove this from here, but I was using it for size(...)
 
 % This chooses which analysis to do. Loop through all analyses, or just do
 % some. 

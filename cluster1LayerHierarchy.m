@@ -39,10 +39,10 @@ isCat = logical([0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1]);
 
 labelsAll = {'Water Depth'; 'Plate Bndy Dist'; 'Coastline Dist'; ...
             'Crustal Age'; 'Sediment Thickn'; 'Surface Current';...
-            'OBS Design'; 'Seismometer'; 'Pressure Guage'; 'Environment'; 'Experiment'}; 
+            'OBS Design'; 'Seismometer'; 'Pressure Gauge'; 'Environment'; 'Experiment'}; 
 
         
-if showSpectrograms || showPenalOptim;        
+if showSpectrograms || showPenalOptim(1);        
     figure(132); clf; hold on; set(gcf, 'pos', [2017 342 2767 1656]); % Figure to hold a bunch of spectra and other things
 else
     thisax = nan; 
@@ -63,7 +63,7 @@ if ~isCat(iquant); % If is quantitative variable
       eachPenaltyTempTotN,...
       penBreak...
       ] = optimize_penalty(OthVarMat(iquant, :), dat, fnew, penaltyFunction, ...
-          thisax, showPenalOptim, 100); 
+          thisax, showPenalOptim(1), 100); 
     title(sprintf('%s: min pen = %2.1f', labelsAll{iquant}, min(eachPenaltyTempTotN) ) ); 
 %     penaltyT = min(eachPenaltyTempTotN);
     penaltyT = min(eachPenaltyTempTot); 

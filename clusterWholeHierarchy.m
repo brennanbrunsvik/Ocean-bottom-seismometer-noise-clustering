@@ -39,13 +39,13 @@ isCat = logical([0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1]);
 
 labelsAll = {'Water Depth'; 'Plate Bndy Dist'; 'Coastline Dist'; ...
             'Crustal Age'; 'Sediment Thickn'; 'Surface Current';...
-            'OBS Design'; 'Seismometer'; 'Pressure Guage'; 'Environment'; 'Experiment'}; 
+            'OBS Design'; 'Seismometer'; 'Pressure Gauge'; 'Environment'; 'Experiment'}; 
 
 
 
 
-cut1 = 'Instrument'; 
-cut2 = 'Water'; 
+cut1 = 'Seismometer'; 
+cut2 = 'Depth'; 
 cut3 = labelsAll{iquant}; 
 
 tempDat = mergedData(iquant); 
@@ -123,6 +123,7 @@ figure(2); clf; set(gcf, 'pos', [2731 1103 496 401]);
 figure(12); clf; hold on; set(gcf, 'pos', [1601 1609 1846 388]); % Dendrogram figure
 figure(132); clf; hold on; set(gcf, 'pos', [2017 342 2767 1656]); % Figure to hold a bunch of spectra and other things
 figure(134); clf; hold on; set(gcf, 'pos', [-1196 247 931 931]); % Experimental figure to combine dendrogram and spectra plots. 
+figure(145); clf; hold on; % Penalty optimization. 
 ax134 = gca(); 
 set(ax134, 'Units','Normalize','Position',[0 0 1 1]); % Make it so figure coordinates and data coordinates are the same. 
 xlim([0, 1]); ylim([0, 1]); 
@@ -152,19 +153,19 @@ if (j<1) & (k>0); continue; end % Doesn't make any sense to split the third laye
 
 [thissubplot, thisname, thisbool, penBreakBest] = clusterAtHierarchy(loopOptimizePenalty, 'i', i, j,...
     thissubplot, pltn, pltm, dataSets.data1, ...
-    dat, fnew, penaltyFunction, showPenalOptim, bools, names); 
+    dat, fnew, penaltyFunction, showPenalOptim(1), bools, names); 
 
 if j > 0; % Execute this code if we are going in 2 deep. Combine the name and boolean for our second "layer". e.g. "shallow + seismometer = T240"
 
     [thissubplot, thisname, thisbool, penBreakBest] = clusterAtHierarchy(loopOptimizePenalty, 'j', j, k,...
         thissubplot, pltn, pltm, dataSets.data2, ...
-        dat, fnew, penaltyFunction, showPenalOptim, bools, names, ...
+        dat, fnew, penaltyFunction, showPenalOptim(2), bools, names, ...
         thisname=thisname, thisbool=thisbool);
 
     if k > 0; % Execute this code if we are going in 3 deep. 
         [thissubplot, thisname, thisbool, penBreakBest] = clusterAtHierarchy(loopOptimizePenalty, 'k', k, 0,...
             thissubplot, pltn, pltm, dataSets.data3, ...
-            dat, fnew, penaltyFunction, showPenalOptim, bools, names, ...
+            dat, fnew, penaltyFunction, showPenalOptim(3), bools, names, ...
             thisname=thisname, thisbool=thisbool);
         bootBools{end+1} = thisbool; 
 
@@ -267,6 +268,12 @@ if showSpectrograms;
         axIns.XTick = [0.001 0.01, 0.1 1]; % Positions of major ticks
         axIns.TickLength = 2 .* [0.01, 0.025];    
         axIns.YMinorTick = 'on'
+        
+%         ylabel('dB'); 
+        text(-0.05, .5, 'dB', ...
+            'horizontalAlignment', 'center', 'verticalAlignment', 'middle', ...
+            'rotation', 90, 'units', 'normalized')
+        
         if i > 1; 
             xticklabels([]); yticklabels([]); 
 %             thisMinX = xlim(); 

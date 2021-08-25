@@ -34,13 +34,13 @@ end
 if loopOptimizePenalty(depthHier); 
     if showPenalOptim & (index==1) & (nextIndex==0);
         showthisplot = true; 
-        figure(132); 
-        thisax = subplot(pltn, pltm, thissubplot); 
-        thissubplot = thissubplot + 1; % On Figure 132  
+        figure(145); 
     else
         showthisplot = false; 
         thisax = nan; 
     end
+    
+
     
 %     if strcmp('string', class(dataSet)); % This is categorical. Just break into categories? 
 %     end
@@ -53,7 +53,7 @@ if loopOptimizePenalty(depthHier);
           eachPenaltyTempTotN,...
           penBreak...
           ] = optimize_penalty(dataSet(thisbool), dat(thisbool,:), fnew, penaltyFunction, ...
-              thisax, showthisplot, 100); 
+              axOptim, showthisplot, 100); 
       [minPen, ipenBreak] = min(eachPenaltyTempTot); 
       penBreakBest = penBreak(ipenBreak); 
       cutInd = penBreakBest; 

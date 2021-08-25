@@ -30,7 +30,7 @@ datCompLabels = {'Z', 'H1', 'H2', 'P', ... % Uncorrected spec
 
 labelsAllUnsort = {'Water Depth'; 'Plate Bndy Dist'; 'Coastline Dist'; ...
             'Crustal Age'; 'Sediment Thickn'; 'Surface Current';...
-            'OBS Design'; 'Seismometer'; 'Pressure Guage'; 'Environment'; 'Experiment'}; 
+            'OBS Design'; 'Seismometer'; 'Pressure Gauge'; 'Environment'; 'Experiment'}; 
 rmv3Lyr = logical([1 0 0 0 0 0 0 1 0 0 0 ]'); 
 frstLyr = 8; 
 scndLyr = 1; 
