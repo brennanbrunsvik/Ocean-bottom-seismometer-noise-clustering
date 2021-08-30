@@ -18,6 +18,7 @@ function [thissubplot, thisname, thisbool, penBreakBest] = clusterAtHierarchy(lo
             names
             options.thisname = nan
             options.thisbool = nan
+            options.optimPlotStruct = nan
     end
 %
 
@@ -34,7 +35,10 @@ end
 if loopOptimizePenalty(depthHier); 
     if showPenalOptim & (index==1) & (nextIndex==0);
         showthisplot = true; 
-        figure(145); 
+        figure(132); 
+%         thisax = subplot(pltn, pltm, thissubplot); 
+%         thissubplot = thissubplot + 1; % On Figure 132  
+        thisax = subplot(3,1,depthHier); 
     else
         showthisplot = false; 
         thisax = nan; 
@@ -53,7 +57,8 @@ if loopOptimizePenalty(depthHier);
           eachPenaltyTempTotN,...
           penBreak...
           ] = optimize_penalty(dataSet(thisbool), dat(thisbool,:), fnew, penaltyFunction, ...
-              axOptim, showthisplot, 100); 
+              thisax, showthisplot, 100, 'showPlot145', showthisplot,...
+              'optimPlotStruct', options.optimPlotStruct); 
       [minPen, ipenBreak] = min(eachPenaltyTempTot); 
       penBreakBest = penBreak(ipenBreak); 
       cutInd = penBreakBest; 

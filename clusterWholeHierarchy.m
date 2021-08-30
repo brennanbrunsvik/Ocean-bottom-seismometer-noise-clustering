@@ -39,9 +39,14 @@ isCat = logical([0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1]);
 
 labelsAll = {'Water Depth'; 'Plate Bndy Dist'; 'Coastline Dist'; ...
             'Crustal Age'; 'Sediment Thickn'; 'Surface Current';...
-            'OBS Design'; 'Seismometer'; 'Pressure Gauge'; 'Environment'; 'Experiment'}; 
+            'OBS Design'; 'Seismometer'; 'Pressure Gauge'; 'Environment'; 'Experiment'};
+unitsAll = {' m'; ' km'; ' km'; ...
+    ' myr'; ' m'; ' m/s(?)';...
+    ''; ''; ''; ''; ''};
 
-
+unit1 = unitsAll{8};
+unit2 = unitsAll{1}; 
+unit3 = unitsAll{iquant}; 
 
 
 cut1 = 'Seismometer'; 
@@ -68,9 +73,11 @@ if isCat(iquant);
     end
     namesAdd = cellstr(eachTempDat); 
 else
-    namesAdd = {['<'], ['>=']};
+    namesAdd = {['$<$'], ['$\geq$']};
     tempDatBools = {"Turn on", "optimization for depth 3"}; 
 end
+
+
 
 bools = {... % Data 1
            {(string(cats(8).data)=="Trillium 240")', ...
@@ -85,7 +92,7 @@ bools = {... % Data 1
 boolsMult = {}; 
 names = {
     {'Trillium 240', 'Guralp CMG3T 120', 'Trillium Compact'},... % Names 1
-    {'<', '>='},... % Names 2
+    {'$<$', '$\geq$'},... % Names 2
      namesAdd,...%}... % Names 3
     }; 
 
@@ -123,11 +130,12 @@ figure(2); clf; set(gcf, 'pos', [2731 1103 496 401]);
 figure(12); clf; hold on; set(gcf, 'pos', [1601 1609 1846 388]); % Dendrogram figure
 figure(132); clf; hold on; set(gcf, 'pos', [2017 342 2767 1656]); % Figure to hold a bunch of spectra and other things
 figure(134); clf; hold on; set(gcf, 'pos', [-1196 247 931 931]); % Experimental figure to combine dendrogram and spectra plots. 
-figure(145); clf; hold on; % Penalty optimization. 
 ax134 = gca(); 
 set(ax134, 'Units','Normalize','Position',[0 0 1 1]); % Make it so figure coordinates and data coordinates are the same. 
 xlim([0, 1]); ylim([0, 1]); 
 axis off;
+figure(145); clf; hold on; set(gcf,'pos', [-513 713 362 271]); % Penalty optimization. 
+
 end
 pltn = 5; pltm = 7; % rows by collumns of main plot
 thissubplot = 1; 
@@ -157,10 +165,13 @@ if (j<1) & (k>0); continue; end % Doesn't make any sense to split the third laye
 
 if j > 0; % Execute this code if we are going in 2 deep. Combine the name and boolean for our second "layer". e.g. "shallow + seismometer = T240"
 
+    optimPlotStruct = struct('title', cut1, 'xlabel',[cut2 ' split'], ...
+        'thisSplit', string(names{1}(i)), 'ind', i); 
     [thissubplot, thisname, thisbool, penBreakBest] = clusterAtHierarchy(loopOptimizePenalty, 'j', j, k,...
         thissubplot, pltn, pltm, dataSets.data2, ...
         dat, fnew, penaltyFunction, showPenalOptim(2), bools, names, ...
-        thisname=thisname, thisbool=thisbool);
+        thisname=thisname, thisbool=thisbool,...
+        optimPlotStruct=optimPlotStruct);
 
     if k > 0; % Execute this code if we are going in 3 deep. 
         [thissubplot, thisname, thisbool, penBreakBest] = clusterAtHierarchy(loopOptimizePenalty, 'k', k, 0,...
@@ -213,40 +224,50 @@ if showSpectrograms;
         thisText = tempNames(k); 
         thisText = thisText{1}; 
         if loopOptimizePenalty(3); 
-            thisText = [thisText sprintf('%1.0f', penBreakBest) newline]; % Only give new line for third depth if doing optimization. Not categories. Too many categories...
+            thisText = [thisText sprintf('%1.0f%s', penBreakBest, unit3) newline]; % Only give new line for third depth if doing optimization. Not categories. Too many categories...
         end
     elseif j > 0; 
         tempNames = names{2}; 
         thisText = tempNames(j); 
         thisText = thisText{1}; 
         if loopOptimizePenalty(2); 
-            thisText = [thisText ' ' sprintf('%1.0f', penBreakBest)]; 
+            thisText = [thisText ' ' sprintf('%1.0f%s', penBreakBest, unit2)]; 
         end
         thisText = [thisText newline]; % Always give new line for second depth. 
     else; 
         tempNames = names{1}; 
         thisText = tempNames{i}; 
-        thisText = [thisText newline]; 
+        thisText = [thisText unit1 newline]; 
     %     thisText = thisText{1}; % Not sure why but I need to comment this
     %     out? 
     end
+%     thisText = [thisText unitsAll{}]; 
     thisTextSplitDend = strrep(thisText, newline, ''); % Hopefully use this to indicate where splitting in dendrogram. 
+    
     % thisText  = sprintf('%s n=%3.0f, P/n=%2.2f', thisText, numdat, penalty/numdat); 
     thisText = [thisText sprintf(['Pav=%1.1f' newline 'n=%1.0f'], penalty/numdat, numdat)];  % Can't just use sprintf over the whole thing. Else \newline will be erased. How obnoxious. 
     % thistxt = text(x, y, thisname, 'Rotation', 0, 'HorizontalAlignment', 'center'); 
-    textPlot = text(x, y, thisText, 'Rotation', 37, 'HorizontalAlignment', 'center'); 
+    textPlot = text(x, y, thisText, 'Rotation', 37, ...
+        'HorizontalAlignment', 'center', 'fontsize', 16); 
     
     figure(134); % Dendrogram + spectrogram figure
     axes(ax134); 
     [xInset, yInset, widthIns, heightIns] = ijkToAxPos3(i,j,k,splits(1),splits(2),splits(3)); % Get position to plot in dendrogram
     textSpaceDendro = 0.025; 
     yDivDendro = dendroConnectLines(ax134, i, j, k, splits, textSpaceDendro); % connect dendro lines. Find breaking point in lines. 
+    thisFontSize = 15; 
+    if k > 0; 
+        thisFontSize = thisFontSize - 2; 
+    end
     text(xInset, yDivDendro, thisTextSplitDend, ...
-        'verticalalignment', 'bottom', 'horizontalalignment', 'center'); 
+        'verticalalignment', 'bottom',...
+        'horizontalalignment', 'center',...
+        'interpreter', 'latex',...
+        'fontsize', thisFontSize); 
     
     axIns = axes('Position', [xInset-.5*widthIns, yInset-.5*heightIns, widthIns, heightIns]);
-    axes(axIns)
-    if (i == 1) & (j == 0) & (k == 0); 
+    axes(axIns); 
+    if (i == 3) & (j == 0) & (k == 0); 
         addColorbar = true; 
     else; 
         addColorbar = false; 
@@ -260,20 +281,19 @@ if showSpectrograms;
     text(0.97, 0.03, sprintf('n=%1.0f',numdat), ...
         'horizontalAlignment', 'right', 'verticalAlignment', 'bottom',...
         'units', 'normalized')
+    grid off; % Turn on only major grid
+    axIns.XTickMode = 'manual'; 
+    axIns.XTick = [0.001 0.01, 0.1 1]; % Positions of major ticks
+    axIns.YMinorTick = 'on';
+    set(gca,'Layer','top'); % Axis stuff plots above histogram
 %     title(thisTextSplitDend); 
     if (j<1) & (k<1); 
         % Customize first hierarchy level ticks and grid
-        grid on; % Turn on only major grid
-        axIns.XTickMode = 'manual'; 
-        axIns.XTick = [0.001 0.01, 0.1 1]; % Positions of major ticks
-        axIns.TickLength = 2 .* [0.01, 0.025];    
-        axIns.YMinorTick = 'on'
-        
-%         ylabel('dB'); 
-        text(-0.05, .5, 'dB', ...
-            'horizontalAlignment', 'center', 'verticalAlignment', 'middle', ...
-            'rotation', 90, 'units', 'normalized')
-        
+%         axIns.XTickMode = 'manual'; 
+%         axIns.XTick = [0.001 0.01, 0.1 1]; % Positions of major ticks
+        axIns.TickLength = 3 .* [0.01, 0.025];    
+%         axIns.YMinorTick = 'on';
+              
         if i > 1; 
             xticklabels([]); yticklabels([]); 
 %             thisMinX = xlim(); 
@@ -282,6 +302,12 @@ if showSpectrograms;
 %                 mean(ylim()), 'dB'); 
         else; 
             xticklabels([]); 
+            % ylabel('dB'); 
+            text(-0.05, .5, 'dB', ...
+            'horizontalAlignment', 'center', 'verticalAlignment', 'middle', ...
+            'rotation', 90, 'units', 'normalized')
+            axIns.TickLength = 2.4 .* [0.01, 0.025];    
+
 %             thisCBar = colorbar('north')
 %             cBarPos = thisCBar.Position; 
 %             cBarPos(1) = cBarPos(1) + 0.3 * cBarPos(3); 
@@ -298,19 +324,21 @@ if showSpectrograms;
                 [thisMinY, thisMinY] + diff(ylim())/20,...
                 {'0.01 Hz', '0.1 Hz'}, ...
                 'horizontalAlignment', 'center'); 
+            axIns.TickLength = 2 .* [0.01, 0.025];    
+
         end
     elseif (k<1) & (j>0); 
         % For second hierarchy layer, have to really customize ticks and
         % grid. 
-        grid off; % Turn off whole grid
-        grid on; % Turn on only major grid. 
+%         grid off; % Turn off whole grid
+%         grid on; % Turn on only major grid. 
         axIns.XTickMode = 'manual'; 
         axIns.XTick = [0.001 0.01, 0.1 1]; 
         axIns.TickLength = 3.5 .* [0.01, 0.025]; 
-        axIns.YMinorTick = 'on'
+        axIns.YMinorTick = 'on'; 
         xticklabels([]); yticklabels([]); 
     elseif k>0; 
-        grid off; 
+%         grid off; 
         axIns.XTickMode = 'manual'; 
         axIns.XTick = [0.001 0.01, 0.1 1]; 
         axIns.TickLength = 4.5 .* [0.01, 0.025]; 
@@ -389,11 +417,12 @@ if showSpectrograms; % show spectrograms sort of morphed into plot anything.
 
 
     axes(ax134); % Dendrogram + spectrogram figure 
-    xTxt = 0.04 
+    xTxt = 0.04; 
     pred1 = (1-penaltyTi  /penaltyUnClust)*100; 
     pred2 = (1-penaltyTij /penaltyUnClust)*100; 
     pred3 = (1-penaltyTijk/penaltyUnClust)*100; 
-    predDiff = diff([0, pred1, pred2, pred3]); % Show gain in reduction from previous level
+%     predDiff = diff([0, pred1, pred2, pred3]); % Show gain in reduction from previous level
+    predDiff = [pred1, pred2, pred3]; % show TOTAL p reduction percent, not change from last time. 
     [~, yTxt, ~, ~] = ijkToAxPos3(1,0,0,splits(1),splits(2),splits(3)); % Get position to plot things on left   
     text(xTxt, yTxt, ...
         [sprintf('%s\nPtot = %1.0f\nPred = %1.0f', cut1, penaltyTi, predDiff(1)) '%'],...
@@ -415,6 +444,7 @@ if showSpectrograms; % show spectrograms sort of morphed into plot anything.
     exportgraphics(figure(132),sprintf('Figures/manual_sep/combined__%s.pdf', textFig));
     exportgraphics(figure(134), sprintf('Figures/dendrogram_spec__%s.pdf', textFig),...
         'contentType', 'vector'); 
+    exportgraphics(figure(145), sprintf('Figures/optim_combined_%s.pdf', textFig)); 
 
 end 
 

@@ -4,6 +4,8 @@ function [yDiv] = dendroConnectLines(ax, i, j, k, splits, textSpace);
 % splits = [3, 2, 3]; 
 % axes(ax134); 
 axes(ax); 
+lineWidth = 1.5; 
+lineCol= 'k'; 
 % textSpace = 0.04; 
 
 [xInset, yInset, widthIns, heightIns] = ...
@@ -26,11 +28,11 @@ if (j<1) & (k<1);
 else; 
     yDiv = yPrev - heightPrev/2 - textSpace; 
     plot([xInset, xInset], [yInset, yDiv], ...
-        'linewidth', 1, 'color', [166, 113, 38]./255); 
+        'linewidth', lineWidth, 'color', lineCol); 
     plot([xInset, xPrev], [yDiv, yDiv] , ...
-        'linewidth', 1, 'color', [166, 113, 38]./255); 
+        'linewidth', lineWidth, 'color', lineCol); 
     plot([xPrev, xPrev], [yPrev, yDiv], ...
-        'linewidth', 1, 'color', [166, 113, 38]./255); 
+        'linewidth', lineWidth, 'color', lineCol); 
 end
 
 

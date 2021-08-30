@@ -31,7 +31,7 @@ labelsAll = {'Water Depth'; 'Plate Bndy Dist'; 'Coastline Dist'; ...
 % some. 
 eachLayerDepth = [3]; % [1,3]; 
 eachDatComp = [1]; % [1, 5, 11]; % [1:size(datCompSpec,2)]; 
-eachQuant = [3]; [1:length(labelsAll)];         
+eachQuant = [3]; % [1:length(labelsAll)];         
 savePenaltFile = false; 
 
 % parpool(8); 

@@ -1,6 +1,6 @@
 function [bootInfo] = bootPenalties(bootBools, dat, fnew, penaltyFunction, penaltyActual);
 showBootPlot = true; % Should put this as argument somewhere probably. 
-NStraps = 1000; % Number of bootstrap-like iterations
+NStraps = 10000; % Number of bootstrap-like iterations
 
 Nspectra = length(bootBools{1});
 Nclusts   = length(bootBools); 
@@ -33,7 +33,7 @@ parfor istrap = [1:NStraps];
     end
     bootPen(istrap, ithisPermuteN) = sum(eachPen); 
 end
-
+ 
 % Calculate some stats from the boot like analysis
 stdb = std(bootPen,1); 
 meanb = mean(bootPen,1); 
@@ -42,7 +42,12 @@ stdDist = (meanb-penaltyActual)./stdb; % Number of standard deviations away from
 
 end
 
+
 if showBootPlot; 
+        
+    unClustPen = cluster_spread(dat, fnew, '', nan, ...
+                        showPlot=false, penalty=penaltyFunction);
+                
     figure(300); set(gcf, 'pos', [-1129 281 842 731]); clf; hold on; 
     sgtitle(sprintf('Actual penalty: %1.0f', penaltyActual)); 
     pltN = 3; pltM = 3; 
@@ -50,10 +55,10 @@ if showBootPlot;
         thisBootPen = bootPen(:,ithisPermuteN); 
         thisBootPenAv = mean(thisBootPen); 
         subplot(pltM, pltN, ithisPermuteN); hold on; 
-        H1 = histogram(thisBootPen,100); % ./penOrig.*100, 100); 
+        H1 = histogram(thisBootPen,35); % ./penOrig.*100, 100); 
         H1.Normalization = 'probability';
-        xlabel('Clustered penalty after permuting spectra'); 
-        ylabel('p(penalty)'); 
+        xlabel('Penalty permuted (\circ)'); 
+        ylabel('Probability of penalty'); 
         
         ylim(gca(), get(gca, 'YLim')); 
         plot([meanb(ithisPermuteN), meanb(ithisPermuteN)],...
@@ -63,19 +68,32 @@ if showBootPlot;
 %         xlimTxt = get(gca,'xlim'); 
 %         text(xlimTxt(1),ylimTxt(2),...
 %             'stuff')
-        thisTxt = text(0.05, 0.85, ...
-            sprintf('Mean: %1.0f\nSTD: %1.1f\nn*STD: %1.1f', ...
+        thisTxt = text(0.04, 1-0.05, ... % 0.05, 0.85, ...
+            sprintf('Mean = %1.0f%c\nSTD = %1.1f%c\nZ = %1.1f', ...
                 meanb(ithisPermuteN), ...
+                char(176),...
                 stdb(ithisPermuteN),...
+                char(176),...
                 stdDist(ithisPermuteN) ),...
             'units', 'normalized', ...
-            'EdgeColor', 'k', 'BackgroundColor', 0.95 .* [1 1 1] ); 
+            'EdgeColor', 'k', 'BackgroundColor', 0.98 .* [1 1 1],... 
+            'horizontalalignment', 'left', 'verticalalignment', 'top'); 
         
-        title(sprintf('Permute %1.0f spectra', permuteNValues(ithisPermuteN))); 
+        title(sprintf('%1.0f spectra permuted', permuteNValues(ithisPermuteN)), ...
+            'fontweight', 'normal'); 
         box on; 
-    end
-    exportgraphics(gcf, 'FIGURES/penalty_random_clusters_1_or_3_layer.png',...
-        'resolution', 300); 
+        
+%         if permuteNValues(ithisPermuteN) == size(dat,1); % if all values were permuted
+        % Plot unclustered penalty. Don't change axix limits though. 
+        thisXlim = xlim; 
+        xlim(thisXlim); 
+        plot([unClustPen, unClustPen], [0, 1], ...
+            '-', 'color', [166, 90, 15]./255, 'linewidth', 2); 
+%     end
+%     exportgraphics(gcf, 'FIGURES/penalty_random_clusters_1_or_3_layer.png',...
+%         'resolution', 500); 
+    set(gca,'Layer','top'); % Axis stuff plots above histogram
+    exportgraphics(gcf, 'FIGURES/penalty_random_clusters_1_or_3_layer.pdf'); 
     
 end
 

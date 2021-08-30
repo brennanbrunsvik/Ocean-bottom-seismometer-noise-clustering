@@ -125,13 +125,17 @@ if ~ options.barePlot;
 end
 
 if options.addColorbar; 
-    disp('do stuf'); 
-    thisCBar = colorbar('north')
-    cBarPos = thisCBar.Position; 
-    cBarPos(1) = cBarPos(1) + 0.3 * cBarPos(3); 
-    cBarPos(3) = .7 * cBarPos(3); 
-    set(thisCBar, 'Position', cBarPos);
-    caxis([vmin, vmax])
+    thisCBar = colorbar('EastOutside'); 
+%     thisCBar=colorbar;
+    thisCBar.Position(1) = thisCBar.Position(1) + 0.0425; 
+    thisCBar.Position(3) = thisCBar.Position(3) * .7; 
+    thisCBar.Ticks = [2:10]; 
+    caxis([vmin, vmax]); 
+%     thisCBar.Position = thisCBar.Position + 1e-10; % 1e-10;
+%     cBarPos = thisCBar.Position; 
+%     cBarPos(1) = cBarPos(1) + 0.3 * cBarPos(3); 
+%     cBarPos(3) = .7 * cBarPos(3); 
+%     set(thisCBar, 'Position', cBarPos);
     
     newTickLabels = thisCBar.TickLabels; 
     for ilabel = [1:length(newTickLabels)]; 

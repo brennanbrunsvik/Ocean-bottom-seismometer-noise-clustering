@@ -5,8 +5,19 @@ function [eachPenaltyTempTrue,...
           eachPenaltyTempFalseN,...
           eachPenaltyTempTotN,...
           newBreaks...
-          ] = optimize_penalty(thisData, dat, fnew, penaltyFunction, thisax, showPlot, numCut); 
-
+          ] = optimize_penalty(thisData, dat, fnew, penaltyFunction, thisax, showPlot, numCut, options); 
+arguments
+    thisData
+    dat
+    fnew
+    penaltyFunction
+    thisax
+    showPlot
+    numCut
+    options.showPlot145 = false; 
+    options.optimPlotStruct = nan; 
+end
+    
 % thisData = dataSets.data1; 
 
 newBreaks = linspace(min(thisData), max(thisData), numCut); 
@@ -74,6 +85,30 @@ legend([falsePlt, truePlt, sumPlt], {'Greater than', 'Less than', 'Total Penalty
 
 % ylim([0 10]); 
 % exportgraphics(gcf, 'Figures/manual_sep/cutoffNormalized.pdf'); 
+end
+
+if options.showPlot145; 
+    pltClrs = {'blue', [148, 76, 0]./255, 'black'}; 
+    figure(145); hold on; 
+    sumPlt = plot(newBreaks, eachPenaltyTempTotN  , 'k', 'linewidth', 1.5,...
+        'DisplayName', options.optimPlotStruct.thisSplit, ...
+        'color', pltClrs{options.optimPlotStruct.ind} ); 
+%     legend(sumPlt, options.optimPlotStruct.thisSplit); 
+    LGD = legend(); 
+    LGD.Location = 'best'; 
+    
+    [minPen, ipenBreak] = min(eachPenaltyTempTotN); 
+%     penBreakBest = newBreaks(ipenBreak); 
+%     cutInd = penBreakBest; 
+    minPenScat = scatter(newBreaks(ipenBreak), ...
+            eachPenaltyTempTotN(ipenBreak), 80, 'ok', 'linewidth', 2, ...
+            'HandleVisibility', 'off',...
+            'MarkerEdgeColor', pltClrs{options.optimPlotStruct.ind} ); 
+    title(options.optimPlotStruct.title, 'fontweight', 'normal'); 
+    xlabel(options.optimPlotStruct.xlabel); 
+    ylabel('Penalty (\circ)')
+    box on; 
+    grid ON; 
 end
 
 end

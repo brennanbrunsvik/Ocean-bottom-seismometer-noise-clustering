@@ -1,0 +1,21 @@
+% This crops a figure, and makes sure there is an appropriate amount of border around it. 
+
+\documentclass[varwidth, border=2pt]{standalone}
+
+\usepackage{subcaption}
+\usepackage[labelformat=parens,labelsep=quad,skip=3pt]{caption}
+\usepackage{graphicx}
+
+\begin{document}
+
+
+\begin{figure}[htbp] 
+   \includegraphics[width=\linewidth,trim={6.5in 0 0 3.2in},clip ]{penalty_random_clusters_1_or_3_layer.pdf} 
+\end{figure}
+
+
+\end{document}
+
+
+
+
