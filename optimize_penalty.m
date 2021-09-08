@@ -104,7 +104,7 @@ if options.showPlot145;
             eachPenaltyTempTotN(ipenBreak), 80, 'ok', 'linewidth', 2, ...
             'HandleVisibility', 'off',...
             'MarkerEdgeColor', pltClrs{options.optimPlotStruct.ind} ); 
-    title(options.optimPlotStruct.title, 'fontweight', 'normal'); 
+%     title(options.optimPlotStruct.title, 'fontweight', 'normal'); 
     xlabel(options.optimPlotStruct.xlabel); 
     ylabel('Penalty (\circ)')
     box on; 

@@ -6,6 +6,9 @@ function [yDiv] = dendroConnectLines(ax, i, j, k, splits, textSpace);
 axes(ax); 
 lineWidth = 1.5; 
 lineCol= 'k'; 
+% textSpace = 0.038 * .8 ; % Needs to be same as ijkToAxPos3.m TODO make input variable
+% labelSpaceTop = 0;%textSpace+.01; % Needs to be same as ijkToAxPos3.m TODO make input variable
+divShiftUp = 0.006; % How far show dividing dendrogram points be above subplot
 % textSpace = 0.04; 
 
 [xInset, yInset, widthIns, heightIns] = ...
@@ -25,8 +28,14 @@ end
 
 if (j<1) & (k<1); 
     yDiv = yPrev + heightIns/2 + 0.006; % Manually add a little space if there was no dendro break above. This is just for putting text there. 
+%     yDiv = yInset + heightIns/2 + 0.006; % Manually add a little space if there was no dendro break above. This is just for putting text there. 
 else; 
-    yDiv = yPrev - heightPrev/2 - textSpace; 
+%     if (j>0)&(k==0); 
+%         yDiv = yPrev - heightPrev/2 - textSpace; 
+%     elseif (j>0)&(k>0); 
+%         yDiv = yPrev - heightPrev/2 - textSpace - labelSpaceTop; 
+        yDiv = yInset + heightIns/2 + divShiftUp; 
+%     end
     plot([xInset, xInset], [yInset, yDiv], ...
         'linewidth', lineWidth, 'color', lineCol); 
     plot([xInset, xPrev], [yDiv, yDiv] , ...

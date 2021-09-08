@@ -126,6 +126,8 @@ end
 
 if options.addColorbar; 
     thisCBar = colorbar('EastOutside'); 
+%     set(thisCBar, 'Label', 'Penalty (\circ)'); 
+    ylabel(thisCBar, 'Penalty', 'fontsize', 12); 
 %     thisCBar=colorbar;
     thisCBar.Position(1) = thisCBar.Position(1) + 0.0425; 
     thisCBar.Position(3) = thisCBar.Position(3) * .7; 

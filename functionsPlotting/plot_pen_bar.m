@@ -28,9 +28,12 @@ datCompLabels = {'Z', 'H1', 'H2', 'P', ... % Uncorrected spec
     'Z corrected', 'Z tilt corrected',... % Corrected spec
     'Z-H1', 'Z-H2', 'Z-P', 'Z-P corrected', 'H'}; % Coherance
 
-labelsAllUnsort = {'Water Depth'; 'Plate Bndy Dist'; 'Coastline Dist'; ...
-            'Crustal Age'; 'Sediment Thickn'; 'Surface Current';...
-            'OBS Design'; 'Seismometer'; 'Pressure Gauge'; 'Environment'; 'Experiment'}; 
+% labelsAllUnsort = {'Water Depth'; 'Plate Bndy Dist'; 'Coastline Dist'; ...
+%             'Crustal Age'; 'Sediment Thickn'; 'Surface Current';...
+%             'OBS Design'; 'Seismometer'; 'Pressure Gauge'; 'Environment'; 'Experiment'};
+labelsAllUnsort = load('labelsAll');
+labelsAllUnsort = labelsAllUnsort.labelsAll; 
+
 rmv3Lyr = logical([1 0 0 0 0 0 0 1 0 0 0 ]'); 
 frstLyr = 8; 
 scndLyr = 1; 
@@ -46,12 +49,13 @@ eachLayerDepth = [1,3]; % plot 3 layer deep first, since penalties are lower, an
 eachDatComp = [1:size(datCompSpec,2)]; 
 eachQuant = [1:length(labelsAllUnsort)];  
         
-figure(70); clf; set(gcf, 'pos', [-1273 1261 400 480]); hold on; 
-t = tiledlayout(2,1,'TileSpacing','compact','Padding','compact');
+figure(70); clf; set(gcf, 'pos', [-1069 1452 702 257]); hold on; 
+t = tiledlayout(1,2,'TileSpacing','tight','Padding','compact');
 % cmap = jet(length(eachDatComp));
 % cmap = hsv(length(eachDatComp)); 
-cmap = lines(length(eachDatComp)); 
+% cmap = lines(length(eachDatComp)); 
 % cmap = colorcube(length(eachDatComp)); 
+cmap = [ 48, 120, 0; 156, 0, 72; 255, 153, 0]./255; 
 
 % Main plotting loop
 for iLayerDepth = eachLayerDepth; % Do layer depths seperately. Easiest coding solution, since single or multiple layer analyses used the same figure windows, and were originally intended to run seperately. 
@@ -113,11 +117,11 @@ for idatcomp = eachDatComp; % Loop through all combinations of datswitcs, seismo
 %                 '-', 'linewidth', .25, 'Color', cmap(idatcomp,:)); % Line connecting dots. Not totally necessary. 
 %             scat1 = scatter([1:size(eachPenalty,1)]', eachPenalty, 100, cmap(idatcomp,:), 'Marker', '+', 'LineWidth', 3); 
 %             scat1 = scatter([1:size(eachPenalty,1)]', eachPenalty, 100, cmap(idatcomp,:), 'Marker', 'o', 'LineWidth', 3); 
-            scat1 = scatter([1:size(eachPenalty,1)]', eachPenalty, 60, cmap(idatcomp,:), 'filled'); 
+            scat1 = scatter([1:size(eachPenalty,1)]', eachPenalty, 40, cmap(idatcomp,:), '*', 'linewidth', 1); 
         elseif iLayerDepth ==3
 %             nothing = plot([1:size(eachPenalty,1)]', eachPenalty, ...
 %                 '-', 'linewidth', .25, 'Color', cmap(idatcomp,:)); 
-            scat3 = scatter([1:size(eachPenalty,1)]', eachPenalty, 60, cmap(idatcomp,:), 'filled'); 
+            scat3 = scatter([1:size(eachPenalty,1)]', eachPenalty, 40, cmap(idatcomp,:), '*', 'linewidth', 1); 
             legPlots(idatcomp) = scat3; 
         end
     end
@@ -182,8 +186,9 @@ ylim([0 40 ]);
     % set(gca, 'xtick', []); 
 % end
 % end x labels
-
-ylabel('Penalty reduction (%)'); 
+if indLayerDepth == 1; 
+    ylabel('Penalty reduction (%)'); 
+end
 box on; 
 grid on; 
 title(sprintf('%1.0f-Layer Hierarchy', iLayerDepth), 'fontweight', 'normal'); 

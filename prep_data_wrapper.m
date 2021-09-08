@@ -27,3 +27,6 @@ else
         prep_data; 
     end
 end
+
+toChange = strcmp(cats(8).data, 'Guralp CMG3T 120'); 
+cats(8).data(toChange) = {'Guralp CMG-3T'}; % Relable Guralps according to Helens Figure 3, 4 (bb2021.09.07)

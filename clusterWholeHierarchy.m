@@ -2,7 +2,7 @@ function [penaltyTijk, penaltyTij, penaltyTi, penaltyUnClust] = clusterWholeHier
     showSpectrograms, showPenalOptim, penaltyFunction, ...
     coh_or_spec, datswitch, component, iquant); 
 
-
+try_boot_penalties = false; 
 
 OBS_TableParams;
 prep_data_wrapper; 
@@ -37,9 +37,10 @@ mergedData = {OthVarMat(1,:), OthVarMat(2,:), OthVarMat(3,:),...
     string(cats(10).data), string(cats(11).data)}; 
 isCat = logical([0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1]); 
 
-labelsAll = {'Water Depth'; 'Plate Bndy Dist'; 'Coastline Dist'; ...
-            'Crustal Age'; 'Sediment Thickn'; 'Surface Current';...
-            'OBS Design'; 'Seismometer'; 'Pressure Gauge'; 'Environment'; 'Experiment'};
+% labelsAll = {'Water Depth'; 'Plate Bndy Dist'; 'Coastline Dist'; ...
+%             'Crustal Age'; 'Sediment Thickn'; 'Surface Current';...
+%             'OBS Design'; 'Seismometer'; 'Pressure Gauge'; 'Environment'; 'Experiment'};
+load('labelsAll'); 
 unitsAll = {' m'; ' km'; ' km'; ...
     ' myr'; ' m'; ' m/s(?)';...
     ''; ''; ''; ''; ''};
@@ -73,7 +74,7 @@ if isCat(iquant);
     end
     namesAdd = cellstr(eachTempDat); 
 else
-    namesAdd = {['$<$'], ['$\geq$']};
+    namesAdd = {['<'], ['\geq']};
     tempDatBools = {"Turn on", "optimization for depth 3"}; 
 end
 
@@ -81,7 +82,7 @@ end
 
 bools = {... % Data 1
            {(string(cats(8).data)=="Trillium 240")', ...
-            (string(cats(8).data)=="Guralp CMG3T 120")', ...
+            (string(cats(8).data)=="Guralp CMG-3T")', ...
             (string(cats(8).data)=="Trillium Compact")'}, ...    
         ... % Data 2
             { OthVarMat(1,:)' < 220, ...
@@ -91,8 +92,8 @@ bools = {... % Data 1
            tempDatBools}; 
 boolsMult = {}; 
 names = {
-    {'Trillium 240', 'Guralp CMG3T 120', 'Trillium Compact'},... % Names 1
-    {'$<$', '$\geq$'},... % Names 2
+    {'Trillium 240', 'Guralp CMG-3T', 'Trillium Compact'},... % Names 1
+    {'<', '\geq'},... % Names 2
      namesAdd,...%}... % Names 3
     }; 
 
@@ -200,7 +201,7 @@ else;
     thisax = nan; 
 end
 penalty = cluster_spread(thiscluster, fnew, replace(thisname, '\newline', '|'), thisax, ...
-    showPlot=showSpectrograms, penalty=penaltyFunction); % Main thing! What is the penalty for this cluster? 
+    showPlot=false, penalty=penaltyFunction); % Main thing! What is the penalty for this cluster? 
 numdat = sum(thisbool); 
 thisname = [thisname sprintf('\\newlineP=%1.0f, n=%3.0f, P/n=%3.1f', penalty, numdat, penalty/numdat) ]; % Add penalty to the name so we can visualize. 
 
@@ -259,11 +260,13 @@ if showSpectrograms;
     if k > 0; 
         thisFontSize = thisFontSize - 2; 
     end
-    text(xInset, yDivDendro, thisTextSplitDend, ...
+    text(xInset, yDivDendro+0.0025, thisTextSplitDend, ...
         'verticalalignment', 'bottom',...
         'horizontalalignment', 'center',...
-        'interpreter', 'latex',...
-        'fontsize', thisFontSize); 
+        'fontsize', thisFontSize, ...
+        'interpreter', 'tex',...
+        'fontname', 'helvetica'); 
+ 
     
     axIns = axes('Position', [xInset-.5*widthIns, yInset-.5*heightIns, widthIns, heightIns]);
     axes(axIns); 
@@ -300,12 +303,47 @@ if showSpectrograms;
 %             thisMinX = thisMinX(1); 
 %             text(thisMinX + diff(xlim()) * .02, ...
 %                 mean(ylim()), 'dB'); 
-        else; 
-            xticklabels([]); 
+%         else; 
+% %             xticklabels([]); %% bb2021.08.30 using normal xtick labels on top left figure. 
+%             % ylabel('dB'); 
+%             text(-0.05, .5, 'dB', ...
+%             'horizontalAlignment', 'center', 'verticalAlignment', 'middle', ...
+%             'rotation', 90, 'units', 'normalized')
+%             axIns.TickLength = 2.4 .* [0.01, 0.025];    
+% 
+% %             thisCBar = colorbar('north')
+% %             cBarPos = thisCBar.Position; 
+% %             cBarPos(1) = cBarPos(1) + 0.3 * cBarPos(3); 
+% %             cBarPos(3) = .7 * cBarPos(3); 
+% %             set(thisCBar, 'Position', cBarPos); 
+% %             colorbar('north'); 
+% %             axCBar = axes('Position', [0, 0, .1, .1])
+% %             colorbar(axCBar)
+        end
+        if i == 1; % Add frequency labels, inside plot and not beneath
+%             thisMinY = ylim(); %% bb2021.08.30 moving x ticks back
+%             outside plot
+%             thisMinY = thisMinY(1); 
+%             text([0.01, 0.1],...
+%                 [thisMinY, thisMinY] + diff(ylim())/20,...
+%                 {'0.01 Hz', '0.1 Hz'}, ...
+%                 'horizontalAlignment', 'center'); 
+            axIns.TickLength = 2 .* [0.01, 0.025];    
+            
+            %             xticklabels([]); %% bb2021.08.30 using normal xtick labels on top left figure. 
             % ylabel('dB'); 
             text(-0.05, .5, 'dB', ...
             'horizontalAlignment', 'center', 'verticalAlignment', 'middle', ...
             'rotation', 90, 'units', 'normalized')
+%             text(0.5, 0.05, 'Hz', ...
+%             'horizontalAlignment', 'center', 'verticalAlignment', 'middle', ...
+%             'rotation', 0, 'units', 'normalized')
+            prevXTicks = get(gca, 'xticklabels'); % Make Hz part of the x tick labels. 
+            for iTick = 1:length(prevXTicks); 
+                prevXTicks{iTick} = [prevXTicks{iTick} ' Hz']; 
+            end
+            set(gca, 'xticklabels', prevXTicks); 
+            
             axIns.TickLength = 2.4 .* [0.01, 0.025];    
 
 %             thisCBar = colorbar('north')
@@ -316,15 +354,6 @@ if showSpectrograms;
 %             colorbar('north'); 
 %             axCBar = axes('Position', [0, 0, .1, .1])
 %             colorbar(axCBar)
-        end
-        if i == 1; % Add frequency labels, inside plot and not beneath
-            thisMinY = ylim(); 
-            thisMinY = thisMinY(1); 
-            text([0.01, 0.1],...
-                [thisMinY, thisMinY] + diff(ylim())/20,...
-                {'0.01 Hz', '0.1 Hz'}, ...
-                'horizontalAlignment', 'center'); 
-            axIns.TickLength = 2 .* [0.01, 0.025];    
 
         end
     elseif (k<1) & (j>0); 
@@ -392,7 +421,7 @@ end % end i
 %%% bootstrap like analysis
 
 %
-if false; % TODO add an option to or not to do this. It takes a lot of computational time. 
+if try_boot_penalties; % TODO add an option to or not to do this. It takes a lot of computational time. 
 bootPenalties(bootBools, dat, fnew, penaltyFunction, penaltyTijk); 
 end
 
@@ -424,17 +453,39 @@ if showSpectrograms; % show spectrograms sort of morphed into plot anything.
 %     predDiff = diff([0, pred1, pred2, pred3]); % Show gain in reduction from previous level
     predDiff = [pred1, pred2, pred3]; % show TOTAL p reduction percent, not change from last time. 
     [~, yTxt, ~, ~] = ijkToAxPos3(1,0,0,splits(1),splits(2),splits(3)); % Get position to plot things on left   
-    text(xTxt, yTxt, ...
-        [sprintf('%s\nPtot = %1.0f\nPred = %1.0f', cut1, penaltyTi, predDiff(1)) '%'],...
-        'HorizontalAlignment', 'center'); 
-    [~, yTxt, ~, ~] = ijkToAxPos3(1,1,0,splits(1),splits(2),splits(3)); 
-    text(xTxt, yTxt, ...
-        [sprintf('%s\nPtot = %1.0f\nPred = %1.0f', cut2, penaltyTij, predDiff(2)) '%'],...
-        'HorizontalAlignment', 'center'); 
-    [~, yTxt, ~, ~] = ijkToAxPos3(1,1,1,splits(1),splits(2),splits(3)); 
-    text(xTxt, yTxt, ...
-        [sprintf('%s\nPtot = %1.0f\nPred = %1.0f', cut3, penaltyTijk, predDiff(3)) '%'],...
-        'HorizontalAlignment', 'center'); 
+    
+    %%% On the dendro/spectrogram figure, insert text stating the thing we
+    %%% split, penalty reduction, and penalty total. 
+    if false; 
+        text(xTxt, yTxt, ...
+            [sprintf('%s\nPtot = %1.0f\nPred = %1.0f', cut1, penaltyTi, predDiff(1)) '%'],...
+            'HorizontalAlignment', 'center'); 
+        [~, yTxt, ~, ~] = ijkToAxPos3(1,1,0,splits(1),splits(2),splits(3)); 
+        text(xTxt, yTxt, ...
+            [sprintf('%s\nPtot = %1.0f\nPred = %1.0f', cut2, penaltyTij, predDiff(2)) '%'],...
+            'HorizontalAlignment', 'center'); 
+        [~, yTxt, ~, ~] = ijkToAxPos3(1,1,1,splits(1),splits(2),splits(3)); 
+        text(xTxt, yTxt, ...
+            [sprintf('%s\nPtot = %1.0f\nPred = %1.0f', cut3, penaltyTijk, predDiff(3)) '%'],...
+            'HorizontalAlignment', 'center'); 
+    else; % If we don't want to do that, then just say the thing we are splitting
+        xTxt = 0.066; 
+        text(xTxt, yTxt, ...
+            cut1,...
+            'HorizontalAlignment', 'center', 'Rotation', 90, 'fontsize', 15); 
+        [~, yTxt, ~, ~] = ijkToAxPos3(1,1,0,splits(1),splits(2),splits(3)); 
+        text(xTxt, yTxt, ...
+            cut2,...
+            'HorizontalAlignment', 'center', 'Rotation', 90, 'fontsize', 12.5); 
+        [~, yTxt, ~, ~] = ijkToAxPos3(1,1,1,splits(1),splits(2),splits(3)); 
+        text(xTxt, yTxt, ...
+            cut3,...
+            'HorizontalAlignment', 'center', 'Rotation', 90, 'fontsize', 10); 
+        clipAnt = annotation(figure(134),'rectangle',...
+            [0.0580021482277121 0.266331658291457 0.807218045112782 0.585427135678392],...
+            'LineWidth', 0.000001, 'color', [1,1,1]); % The text keeps getting slightly lopped off after exporting to a pdf. Adding a white, super tiny line around the figure prevents the text from getting lopped off. You can't see the line. It might cause a glitch someday on somebodies computer though. 
+    end
+        
     
     uistack(ax134, 'bottom');
 
