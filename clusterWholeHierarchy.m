@@ -2,7 +2,7 @@ function [penaltyTijk, penaltyTij, penaltyTi, penaltyUnClust] = clusterWholeHier
     showSpectrograms, showPenalOptim, penaltyFunction, ...
     coh_or_spec, datswitch, component, iquant); 
 
-try_boot_penalties = true; 
+try_boot_penalties = false; 
 
 OBS_TableParams;
 prep_data_wrapper; 
@@ -338,11 +338,12 @@ if showSpectrograms;
 %             text(0.5, 0.05, 'Hz', ...
 %             'horizontalAlignment', 'center', 'verticalAlignment', 'middle', ...
 %             'rotation', 0, 'units', 'normalized')
-            prevXTicks = get(gca, 'xticklabels'); % Make Hz part of the x tick labels. 
+            prevXTicks = get(gca, 'xticklabels'); % Make Hz part of the x tick labels.
+            newXTicks = prevXTicks; 
             for iTick = 1:length(prevXTicks); 
-                prevXTicks{iTick} = [prevXTicks{iTick} ' Hz']; 
+                newXTicks{iTick} = [prevXTicks{iTick} ' Hz']; 
             end
-            set(gca, 'xticklabels', prevXTicks); 
+            set(gca, 'xticklabels', newXTicks(end:-1:1)); % For some reason when setting the xticks, they apply in reversed order. So flip the newXTicks before settings them. This might not apply on some later version of MATLAB...
             
             axIns.TickLength = 2.4 .* [0.01, 0.025];    
 
