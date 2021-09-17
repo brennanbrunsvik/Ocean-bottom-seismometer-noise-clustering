@@ -2,7 +2,7 @@ function [penaltyTijk, penaltyTij, penaltyTi, penaltyUnClust] = clusterWholeHier
     showSpectrograms, showPenalOptim, penaltyFunction, ...
     coh_or_spec, datswitch, component, iquant); 
 
-try_boot_penalties = false; 
+try_boot_penalties = true; 
 
 OBS_TableParams;
 prep_data_wrapper; 

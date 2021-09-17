@@ -6,6 +6,8 @@ Nspectra = length(bootBools{1});
 Nclusts   = length(bootBools); 
 
 permuteNValues = [2, 5, floor([1/20, 1/8, 1/2, 1] .* Nspectra)]; % Using something automatic like this in case the number of input spectra changes. 
+% permuteNValues = [Nspectra]; % Using something automatic like this in case the number of input spectra changes. 
+
 
 bootPen = nan(NStraps, length(permuteNValues));  % shape = (each bootstrap like analisis, by each number of permuted values)
 for ithisPermuteN = 1:length(permuteNValues); 
@@ -51,7 +53,6 @@ if showBootPlot;
                     
                 
     figure(300); set(gcf, 'pos', [-1129 281 842 731]); clf; hold on; 
-    sgtitle(sprintf('Actual penalty: %1.0f', penaltyActual)); 
     pltN = 3; pltM = 3; 
     for ithisPermuteN = 1:length(permuteNValues); 
         thisBootPen = bootPen(:,ithisPermuteN); 
@@ -61,6 +62,8 @@ if showBootPlot;
         pSort = sort(thisBootPen); 
         perc95 = pSort( floor(length(pSort).*.05) ); % 95 percent of penalties were higher than this. 
         penRed_perc95 = -(perc95-unClustPen)/unClustPen .* 100; 
+        penRedActual = -(penaltyActual - unClustPen) / unClustPen .* 100; 
+        penAvRed = -(meanb - unClustPen) / unClustPen .* 100; 
         sprintf('With %1.0f permuted spectra, penalty reduction beneath which 95%% of random groupings fell: %1.2f%%',...
             permuteNValues(ithisPermuteN), penRed_perc95)
         
@@ -112,10 +115,12 @@ if showBootPlot;
 %     end
 %     exportgraphics(gcf, 'FIGURES/penalty_random_clusters_1_or_3_layer.png',...
 %         'resolution', 500); 
-    set(gca,'Layer','top'); % Axis stuff plots above histogram
+
+    set(gca,'Layer','top'); % Axis stuff plots above histogram    
+    end
+    sgtitle(sprintf('Actual penalty: %1.0f, %0.1f%%, unclust penalty: %1.0f, bootPenAv: %1.0f, %0.3f%%,\n95%% confidence: %1.0f, %0.3f%%\n',...
+    penaltyActual, penRedActual, unClustPen, thisBootPenAv, penAvRed, perc95, penRed_perc95)); 
     exportgraphics(gcf, 'FIGURES/penalty_random_clusters_1_or_3_layer.pdf'); 
-    
-end
 
 end
 
