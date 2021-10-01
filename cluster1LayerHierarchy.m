@@ -67,6 +67,23 @@ if ~isCat(iquant); % If is quantitative variable
     title(sprintf('%s: min pen = %2.1f', labelsAll{iquant}, min(eachPenaltyTempTotN) ) ); 
 %     penaltyT = min(eachPenaltyTempTotN);
     penaltyT = min(eachPenaltyTempTot); 
+    
+    % bb2021.09.30 Plot the geq and leq data groups
+    figure(208); clf; hold on; 
+    [penMin, penMinI] = min(eachPenaltyTempTot); 
+    breakPen = penBreak(penMinI); 
+    dat1Boo = OthVarMat(iquant, :) >=breakPen; % In calusterWholeHierarchy I use >= and < I think
+    dat2Boo = OthVarMat(iquant, :) < breakPen; 
+    cluster_spread(dat(dat1Boo,:), fnew, 'x \geq', subplot(1,2,1), 'showPlot', 'true', ...
+        'penalty', penaltyFunction, 'barePlot', 'false', 'addColorbar', true);
+    cluster_spread(dat(dat2Boo,:), fnew, 'x <', subplot(1,2,2), 'showPlot', 'true', ...
+        'penalty', penaltyFunction, 'barePlot', 'false', 'addColorbar', true); 
+    
+    sprintf([newline newline newline...
+        'For optimized dataset (water?) on %s, optimal split value (depth?) = %1.0f'...
+        newline newline newline], ...
+        '???', breakPen)
+    
     % TODO need to get spectra plots going here
 else % If is a categorical data
 %     figure(232); clf; hold on; set(gcf, 'pos', [2017 342 2767 1656]); 

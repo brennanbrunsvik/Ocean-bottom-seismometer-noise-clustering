@@ -2,7 +2,8 @@
 % close all; 
 sameStasAllAnalyses = true; 
 showSpectrograms = true; 
-showPenalOptim = logical([0 1 0]); % 
+% showPenalOptim = logical([0 1 0]); % 
+showPenalOptim = logical(1); disp('Use this only for 1 layer deep hierarchy thing')
 penaltyFunction = 'spectral_angle'; 
 coh_or_spec = 'spec'; % coherance (coh) or spectra (spec)
 addpath('./boot'); 
@@ -36,9 +37,9 @@ save('labelsAll', 'labelsAll');
         
 % This chooses which analysis to do. Loop through all analyses, or just do
 % some. 
-eachLayerDepth = [3]; % [1,3]; 
+eachLayerDepth = [1]; % [1,3]; 
 eachDatComp = [1]; % [1, 5, 11]; % [1:size(datCompSpec,2)]; 
-eachQuant = [3]; % [1:length(labelsAll)];         
+eachQuant = [1]; % [1:length(labelsAll)];         
 savePenaltFile = false; 
 
 % parpool(8); 

@@ -20,7 +20,7 @@ end
     
 % thisData = dataSets.data1; 
 
-newBreaks = linspace(min(thisData), max(thisData), numCut); 
+newBreaks = sort(unique(thisData)); % Try values corresponding to each station. % linspace(min(thisData), max(thisData), numCut); 
 eachPenaltyTempTrue = nan(size(newBreaks)); 
 eachPenaltyTempFalse = nan(size(newBreaks)); 
 eachPenaltyTempTot = nan(size(newBreaks)); 
@@ -83,6 +83,14 @@ plot(newBreaks, numTrue, '--r');
 
 legend([falsePlt, truePlt, sumPlt], {'Greater than', 'Less than', 'Total Penalty'}, 'Location', 'best'); 
 
+% %%% If you want to see the optimal division threshold, just uncomment this
+% %%% couple of lines. 
+% [minPen, ipenBreak] = min(eachPenaltyTempTotN); 
+% sprintf([newline newline newline...
+%     'For optimized dataset (water?) on %s, optimal split value (depth?) = %1.0f'...
+%     newline newline newline], ...
+%     '???', newBreaks(ipenBreak))
+
 % ylim([0 10]); 
 % exportgraphics(gcf, 'Figures/manual_sep/cutoffNormalized.pdf'); 
 end
@@ -104,11 +112,19 @@ if options.showPlot145;
             eachPenaltyTempTotN(ipenBreak), 80, 'ok', 'linewidth', 2, ...
             'HandleVisibility', 'off',...
             'MarkerEdgeColor', pltClrs{options.optimPlotStruct.ind} ); 
+    
+    sprintf([newline newline newline...
+        'For optimized dataset (water?) on %s, optimal split value (depth?) = %1.0f'...
+        newline newline newline], ...
+        options.optimPlotStruct.thisSplit, newBreaks(ipenBreak))
+
 %     title(options.optimPlotStruct.title, 'fontweight', 'normal'); 
     xlabel(options.optimPlotStruct.xlabel); 
     ylabel('Penalty (\circ)')
     box on; 
     grid ON; 
+    set(gca,'XMinorTick','on')
+        
 end
 
 end
