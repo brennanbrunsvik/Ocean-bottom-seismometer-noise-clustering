@@ -1,9 +1,9 @@
 % clear; 
 % close all; 
 sameStasAllAnalyses = true; 
-showSpectrograms = true; 
-% showPenalOptim = logical([0 1 0]); % 
-showPenalOptim = logical(1); disp('Use this only for 1 layer deep hierarchy thing')
+showSpectrograms = false; 
+showPenalOptim = logical([0 1 0]); % 
+% showPenalOptim = logical(1); disp('Use this only for 1 layer deep hierarchy thing')
 penaltyFunction = 'spectral_angle'; 
 coh_or_spec = 'spec'; % coherance (coh) or spectra (spec)
 addpath('./boot'); 
@@ -37,10 +37,11 @@ save('labelsAll', 'labelsAll');
         
 % This chooses which analysis to do. Loop through all analyses, or just do
 % some. 
-eachLayerDepth = [1]; % [1,3]; 
-eachDatComp = [1]; % [1, 5, 11]; % [1:size(datCompSpec,2)]; 
-eachQuant = [1]; % [1:length(labelsAll)];         
-savePenaltFile = false; 
+eachLayerDepth = [1,3]; 
+% eachDatComp = [1:size(datCompSpec,2)]; 
+eachDatComp = [1, 5, 11]; 
+eachQuant = [1:length(labelsAll)];   
+savePenaltFile = true; 
 
 % parpool(8); 
         
@@ -52,12 +53,19 @@ datswitch   = thisDatCompSpec{1};
 component   = thisDatCompSpec{2}; 
 coh_or_spec = thisDatCompSpec{3}; 
 
+%%% Disp some info...
+finPenFile = sprintf('pen_results/penalties_%s_layerDepth%1.0f_datswitch%1.0f_component%1.0f.mat',...
+    coh_or_spec, iLayerDepth, datswitch, component) 
+% end
+% end
+%%% End disp some info
+
 eachPenalty      = zeros(size(labelsAll,1), 1); % Penalty to collect while doing the iquant loop
 eachPenalty2Deep = nan  (size(labelsAll,1), 1); % Auxiliary info, but used for plotting later. only care if doing 3 layer hierarchy. 
 eachPenalty1Deep = nan  (size(labelsAll,1), 1); 
 penaltyUnClust   = nan  (size(labelsAll,1), 1); % only need this once, but this works in the parfor...
 % for iquant = eachQuant; % If not doing plots, switch to parfor
-for iquant = eachQuant; % Loop through each explanatory/independent variable ("quant" is here for legacy purpose basically) % Slower to put this loop so high up in code, but makes it easier to think and develop the code. 
+parfor iquant = eachQuant; % Loop through each explanatory/independent variable ("quant" is here for legacy purpose basically) % Slower to put this loop so high up in code, but makes it easier to think and develop the code. 
 % !!! Do all the real processing at this section.
 
     if iLayerDepth == 1; 
@@ -76,11 +84,11 @@ for iquant = eachQuant; % Loop through each explanatory/independent variable ("q
 
 end
 
-finPenData = struct('eachPenalty', eachPenalty, ...
-                    'eachPenalty2Deep', eachPenalty2Deep, ...
-                    'eachPenalty3Deep', eachPenalty1Deep, ...
-                    'labelsAll', labelsAll, ...
-                    'penaltyUnClust', penaltyUnClust); % Add other things later. 
+finPenData = struct('eachPenalty', eachPenalty', ...
+                    'eachPenalty2Deep', eachPenalty2Deep', ...
+                    'eachPenalty3Deep', eachPenalty1Deep', ...
+                    'labelsAll', labelsAll', ...
+                    'penaltyUnClust', penaltyUnClust'); % Add other things later. 
 finPenFile = sprintf('pen_results/penalties_%s_layerDepth%1.0f_datswitch%1.0f_component%1.0f.mat',...
     coh_or_spec, iLayerDepth, datswitch, component); 
 if savePenaltFile; 

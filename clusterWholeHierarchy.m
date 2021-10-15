@@ -2,7 +2,7 @@ function [penaltyTijk, penaltyTij, penaltyTi, penaltyUnClust] = clusterWholeHier
     showSpectrograms, showPenalOptim, penaltyFunction, ...
     coh_or_spec, datswitch, component, iquant); 
 
-try_boot_penalties = true; 
+try_boot_penalties = false; % Parameter you change. Decide if you want to do the significance analysis or not. 
 
 OBS_TableParams;
 prep_data_wrapper; 
@@ -74,7 +74,7 @@ if isCat(iquant);
     end
     namesAdd = cellstr(eachTempDat); 
 else
-    namesAdd = {['<'], ['\geq']};
+    namesAdd = {['\leq'], ['>']}; % Which one gets geq/leq and which gets > or < is dependent on how we decide on plotting, not on how we seperate the clusters. Because the values plotted actually correspond to max or min values in that cluster.
     tempDatBools = {"Turn on", "optimization for depth 3"}; 
 end
 
@@ -93,7 +93,7 @@ bools = {... % Data 1
 boolsMult = {}; 
 names = {
     {'Trillium 240', 'Guralp CMG-3T', 'Trillium Compact'},... % Names 1
-    {'<', '\geq'},... % Names 2
+    {'\leq', '>'},... % Names 2 % Which one gets geq/leq and which gets > or < is dependent on how we decide on plotting, not on how we seperate the clusters. Because the values plotted actually correspond to max or min values in that cluster. 
      namesAdd,...%}... % Names 3
     }; 
 
@@ -160,7 +160,7 @@ for k = [0:splits(3)]; % Third level
 
 if (j<1) & (k>0); continue; end % Doesn't make any sense to split the third layer and not the second. Algorithm breaks without this
 
-[thissubplot, thisname, thisbool, penBreakBest] = clusterAtHierarchy(loopOptimizePenalty, 'i', i, j,...
+[thissubplot, thisname, thisbool, penBreakBest, datMaxClst, datMinClst] = clusterAtHierarchy(loopOptimizePenalty, 'i', i, j,...
     thissubplot, pltn, pltm, dataSets.data1, ...
     dat, fnew, penaltyFunction, showPenalOptim(1), bools, names); 
 
@@ -168,14 +168,14 @@ if j > 0; % Execute this code if we are going in 2 deep. Combine the name and bo
 
     optimPlotStruct = struct('title', cut1, 'xlabel',[cut2 ' split'], ...
         'thisSplit', string(names{1}(i)), 'ind', i); 
-    [thissubplot, thisname, thisbool, penBreakBest] = clusterAtHierarchy(loopOptimizePenalty, 'j', j, k,...
+    [thissubplot, thisname, thisbool, penBreakBest, datMaxClst, datMinClst] = clusterAtHierarchy(loopOptimizePenalty, 'j', j, k,...
         thissubplot, pltn, pltm, dataSets.data2, ...
         dat, fnew, penaltyFunction, showPenalOptim(2), bools, names, ...
         thisname=thisname, thisbool=thisbool,...
         optimPlotStruct=optimPlotStruct);
 
     if k > 0; % Execute this code if we are going in 3 deep. 
-        [thissubplot, thisname, thisbool, penBreakBest] = clusterAtHierarchy(loopOptimizePenalty, 'k', k, 0,...
+        [thissubplot, thisname, thisbool, penBreakBest, datMaxClst, datMinClst] = clusterAtHierarchy(loopOptimizePenalty, 'k', k, 0,...
             thissubplot, pltn, pltm, dataSets.data3, ...
             dat, fnew, penaltyFunction, showPenalOptim(3), bools, names, ...
             thisname=thisname, thisbool=thisbool);
@@ -225,14 +225,32 @@ if showSpectrograms;
         thisText = tempNames(k); 
         thisText = thisText{1}; 
         if loopOptimizePenalty(3); 
-            thisText = [thisText sprintf('%1.0f%s', penBreakBest, unit3) newline]; % Only give new line for third depth if doing optimization. Not categories. Too many categories...
+            if k == 1; 
+                penBreakTemp = round(datMaxClst); 
+                penBreakTempk1 = penBreakTemp; % Save this for comparing to during next iteration
+            elseif k == 2; 
+                penBreakTemp = round(datMinClst); 
+                if (penBreakTemp < penBreakTempk1) || (penBreakTemp == (penBreakTempk1 + 1)); % We don't want e.g. <= 72 and > 73... that looks suspicious. Neither would we want <= 72 and > 71. 
+                    penBreakTemp = penBreakTempk1; 
+                end
+            end
+            thisText = [thisText sprintf('%1.0f%s', penBreakTemp, unit3) newline]; % Only give new line for third depth if doing optimization. Not categories. Too many categories...
         end
     elseif j > 0; 
         tempNames = names{2}; 
         thisText = tempNames(j); 
         thisText = thisText{1}; 
         if loopOptimizePenalty(2); 
-            thisText = [thisText ' ' sprintf('%1.0f%s', penBreakBest, unit2)]; 
+            if j == 1; 
+                penBreakTemp = round(datMaxClst); 
+                penBreakTempj1 = penBreakTemp; % Save this for comparing to during next iteration
+            elseif j == 2; 
+                penBreakTemp = round(datMinClst); 
+                if (penBreakTemp < penBreakTempj1) || (penBreakTemp == (penBreakTempj1 + 1)); % We don't want e.g. <= 72 and > 73... that looks suspicious. Neither would we want <= 72 and > 71.
+                    penBreakTemp = penBreakTempj1; 
+                end
+            end
+            thisText = [thisText ' ' sprintf('%1.0f%s', penBreakTemp, unit2)]; 
         end
         thisText = [thisText newline]; % Always give new line for second depth. 
     else; 

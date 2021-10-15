@@ -82,10 +82,11 @@ for idatcomp = eachDatComp; % Loop through all combinations of datswitcs, seismo
     eachPenalty = finPenData.eachPenalty; 
     eachPenalty = eachPenalty ./ penaltyUnClust .* 100; % normalize penalties to what it would be if they were not clustered
     eachPenalty = 100 - eachPenalty; % Converting to penalty reduction
-    
+    disp(eachPenalty)
+        
     penaltySortPlot = [1:length(eachPenalty)]'; 
     if ~ recalcOrder; 
-        load(['penaltySortPlotDepth' num2str(iLayerDepth) '.mat']); 
+        load(['penaltySortPlotDepth' num2str(iLayerDepth) '.mat']); % Need to run first time with recalcOrder True. Then you can run with recalcOrder false, and it displays things in the correct order. 
     end
     eachPenalty = eachPenalty(penaltySortPlot); 
     labelsAll = labelsAllUnsort(penaltySortPlot); 

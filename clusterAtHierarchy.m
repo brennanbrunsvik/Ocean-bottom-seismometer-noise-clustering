@@ -1,4 +1,4 @@
-function [thissubplot, thisname, thisbool, penBreakBest] = clusterAtHierarchy(loopOptimizePenalty, ijk, index, nextIndex, ...
+function [thissubplot, thisname, thisbool, penBreakBest, datMax, datMin] = clusterAtHierarchy(loopOptimizePenalty, ijk, index, nextIndex, ...
     thissubplot, pltn, pltm, dataSet, ...
     dat, fnew, penaltyFunction, showPenalOptim, bools, names, options); 
     arguments
@@ -63,17 +63,22 @@ if loopOptimizePenalty(depthHier);
       penBreakBest = penBreak(ipenBreak); 
       cutInd = penBreakBest; 
       
-      if index == 1; 
-          thisboolNew = (dataSet  < penBreakBest)'; % 
-      elseif index == 2; 
-          thisboolNew = (dataSet >= penBreakBest)'; % excludes nans!!!! any nans will come back as false. They are evaluated when index == 3. 
-      elseif index == 3; 
-          thisboolNew = isnan(dataSet)'; 
-      end
+    if index == 1; 
+      thisboolNew = (dataSet  < penBreakBest)'; % 
+    elseif index == 2; 
+      thisboolNew = (dataSet >= penBreakBest)'; % excludes nans!!!! any nans will come back as false. They are evaluated when index == 3. 
+    elseif index == 3; 
+      thisboolNew = isnan(dataSet)'; 
+    end
       
+    datMax = max(dataSet(thisboolNew)); % highest value data within this new subgroup. 
+    datMin = min(dataSet(thisboolNew)); % lowest value data within this new subgroup. 
+
 else; 
     thisboolNew = bools{depthHier}{index}; % Base level boolean. The dataset corresponding to thisname. 
     penBreakBest = NaN; 
+    datMax = nan; 
+    datMin = nan; 
 end
 
 % thisname = sprintf('%s \n %s - %4.0f m \n', thisname, names{2}{j}, cut2)
