@@ -71,8 +71,8 @@ if loopOptimizePenalty(depthHier);
       thisboolNew = isnan(dataSet)'; 
     end
       
-    datMax = max(dataSet(thisboolNew)); % highest value data within this new subgroup. 
-    datMin = min(dataSet(thisboolNew)); % lowest value data within this new subgroup. 
+    datMax = max(dataSet(and(thisboolNew, thisbool))); % highest value data within this new subgroup. 
+    datMin = min(dataSet(and(thisboolNew, thisbool))); % lowest value data within this new subgroup. 
 
 else; 
     thisboolNew = bools{depthHier}{index}; % Base level boolean. The dataset corresponding to thisname. 

@@ -230,9 +230,10 @@ if showSpectrograms;
                 penBreakTempk1 = penBreakTemp; % Save this for comparing to during next iteration
             elseif k == 2; 
                 penBreakTemp = round(datMinClst); 
-                if (penBreakTemp < penBreakTempk1) || (penBreakTemp == (penBreakTempk1 + 1)); % We don't want e.g. <= 72 and > 73... that looks suspicious. Neither would we want <= 72 and > 71. 
-                    penBreakTemp = penBreakTempk1; 
-                end
+% % %                 % Uncomment this if you want to make sure you don't have silly >= and < values that are mismatched by 1
+% % %                 if (penBreakTemp < penBreakTempk1) || (penBreakTemp == (penBreakTempk1 + 1)); % We don't want e.g. <= 72 and > 73... that looks suspicious. Neither would we want <= 72 and > 71. 
+% % %                     penBreakTemp = penBreakTempk1; 
+% % %                 end
             end
             thisText = [thisText sprintf('%1.0f%s', penBreakTemp, unit3) newline]; % Only give new line for third depth if doing optimization. Not categories. Too many categories...
         end
@@ -246,9 +247,10 @@ if showSpectrograms;
                 penBreakTempj1 = penBreakTemp; % Save this for comparing to during next iteration
             elseif j == 2; 
                 penBreakTemp = round(datMinClst); 
-                if (penBreakTemp < penBreakTempj1) || (penBreakTemp == (penBreakTempj1 + 1)); % We don't want e.g. <= 72 and > 73... that looks suspicious. Neither would we want <= 72 and > 71.
-                    penBreakTemp = penBreakTempj1; 
-                end
+% % %                 % Uncomment this if you want to make sure you don't have silly >= and < values that are mismatched by 1
+% % %                 if (penBreakTemp < penBreakTempj1) || (penBreakTemp == (penBreakTempj1 + 1)); % We don't want e.g. <= 72 and > 73... that looks suspicious. Neither would we want <= 72 and > 71.
+% % %                     penBreakTemp = penBreakTempj1; 
+% % %                 end
             end
             thisText = [thisText ' ' sprintf('%1.0f%s', penBreakTemp, unit2)]; 
         end

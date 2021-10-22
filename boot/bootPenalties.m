@@ -10,7 +10,8 @@ permuteNValues = [2, 5, floor([1/20, 1/8, 1/2, 1] .* Nspectra)]; % Using somethi
 
 
 bootPen = nan(NStraps, length(permuteNValues));  % shape = (each bootstrap like analisis, by each number of permuted values)
-for ithisPermuteN = 1:length(permuteNValues); 
+% for ithisPermuteN = 1:length(permuteNValues); 
+for ithisPermuteN = length(permuteNValues); disp('Only doing final grouping now bootPenalties')
 thisPermuteN = permuteNValues(ithisPermuteN); 
 parfor istrap = [1:NStraps]; 
     

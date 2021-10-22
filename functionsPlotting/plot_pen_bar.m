@@ -3,7 +3,9 @@
 %         
 
 lineOrBar = 'line'; 
-recalcOrder = false; % calculate the order of which variables did best at reducing penalty. 
+showMeanPens = true; 
+% recalcOrder = false; % calculate the order of which variables did best at reducing penalty. 
+for recalcOrder = [true, false]; 
 
 whichAnalyze = [1, 5, 11]; 
 
@@ -82,14 +84,19 @@ for idatcomp = eachDatComp; % Loop through all combinations of datswitcs, seismo
     eachPenalty = finPenData.eachPenalty; 
     eachPenalty = eachPenalty ./ penaltyUnClust .* 100; % normalize penalties to what it would be if they were not clustered
     eachPenalty = 100 - eachPenalty; % Converting to penalty reduction
-    disp(eachPenalty)
         
     penaltySortPlot = [1:length(eachPenalty)]'; 
     if ~ recalcOrder; 
         load(['penaltySortPlotDepth' num2str(iLayerDepth) '.mat']); % Need to run first time with recalcOrder True. Then you can run with recalcOrder false, and it displays things in the correct order. 
+        if showMeanPens
+            meanPenPlot = load(['meanPenPlot' num2str(iLayerDepth) '.mat']).meanPen(penaltySortPlot); % Get average accross components. 
+            scatter([1:size(eachPenalty,1)]', meanPenPlot', 'k', '*', 'linewidth', 1);  % Plot average accross components. 
+            sprintf('Average of all penalty reductions accross parameters first then components: %1.4f', nanmean(meanPenPlot))
+        end
     end
     eachPenalty = eachPenalty(penaltySortPlot); 
     labelsAll = labelsAllUnsort(penaltySortPlot); 
+   
 
     pltLineWidth = 2; 
     if iLayerDepth == 3; 
@@ -160,6 +167,7 @@ if all(penaltySortPlot == [1:length(penaltySortPlot)]'); % Don't calculate the n
     [~,penaltySortPlot] = sort(meanPen);
     penaltySortPlot = penaltySortPlot(end:-1:1); 
     save(['penaltySortPlotDepth' num2str(iLayerDepth) '.mat'], 'penaltySortPlot'); 
+    save(['meanPenPlot' num2str(iLayerDepth) '.mat'], 'meanPen'); 
 end % end sorting
 
 %%% Bar plot
@@ -204,7 +212,7 @@ text(0.98, 0.96, plotLabels{indLayerDepth}, ...
 
 end % End main plotting loop
 
-
+end
 
 exportgraphics(gcf, 'FIGURES/clusteredPenaltiesCompilation.pdf')
 

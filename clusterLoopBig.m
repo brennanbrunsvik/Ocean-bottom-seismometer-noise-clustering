@@ -1,7 +1,7 @@
 % clear; 
 % close all; 
 sameStasAllAnalyses = true; 
-showSpectrograms = false; 
+showSpectrograms = true; 
 showPenalOptim = logical([0 1 0]); % 
 % showPenalOptim = logical(1); disp('Use this only for 1 layer deep hierarchy thing')
 penaltyFunction = 'spectral_angle'; 
@@ -37,11 +37,12 @@ save('labelsAll', 'labelsAll');
         
 % This chooses which analysis to do. Loop through all analyses, or just do
 % some. 
-eachLayerDepth = [1,3]; 
+eachLayerDepth = [3]; % [1,3]; 
 % eachDatComp = [1:size(datCompSpec,2)]; 
-eachDatComp = [1, 5, 11]; 
-eachQuant = [1:length(labelsAll)];   
-savePenaltFile = true; 
+eachDatComp = [1]; % [1, 5, 11]; 
+% eachQuant = [1:length(labelsAll)];  
+eachQuant = [3]; 
+savePenaltFile = false; 
 
 % parpool(8); 
         
@@ -65,7 +66,7 @@ eachPenalty2Deep = nan  (size(labelsAll,1), 1); % Auxiliary info, but used for p
 eachPenalty1Deep = nan  (size(labelsAll,1), 1); 
 penaltyUnClust   = nan  (size(labelsAll,1), 1); % only need this once, but this works in the parfor...
 % for iquant = eachQuant; % If not doing plots, switch to parfor
-parfor iquant = eachQuant; % Loop through each explanatory/independent variable ("quant" is here for legacy purpose basically) % Slower to put this loop so high up in code, but makes it easier to think and develop the code. 
+for iquant = eachQuant; % Loop through each explanatory/independent variable ("quant" is here for legacy purpose basically) % Slower to put this loop so high up in code, but makes it easier to think and develop the code. 
 % !!! Do all the real processing at this section.
 
     if iLayerDepth == 1; 
