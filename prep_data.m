@@ -37,8 +37,8 @@ if sameStasAllAnalyses;
     bind = badDatAll; 
     gind = goodDatAll; 
 else; 
-    bind=find(isnan(sum(coh_stack))==1);
-    gind=find(isnan(sum(coh_stack))==0);
+    bind=find(isnan(sum(spc_stack))==1); % bb2021.11.01 Should be spc_stack OR coh_stack depending on datswitch??? I switched from coh_stack to spc_stack
+    gind=find(isnan(sum(spc_stack))==0);
 end
 spc_stack(:,bind)=[];
 spc_stack=spc_stack';
