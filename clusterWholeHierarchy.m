@@ -4,6 +4,7 @@ function [penaltyTijk, penaltyTij, penaltyTi, penaltyUnClust] = clusterWholeHier
 
 try_boot_penalties = false; % Parameter you change. Decide if you want to do the significance analysis or not. 
 
+componentFull = component; % For component = 23, It's going to get changed to 3 (I think). So some figures might be saved with component 3 instead... bb2021.11.01
 OBS_TableParams;
 prep_data_wrapper; 
 % if strcmp(coh_or_spec, 'coh'); 
@@ -74,7 +75,7 @@ if isCat(iquant);
     end
     namesAdd = cellstr(eachTempDat); 
 else
-    namesAdd = {['\leq'], ['>']}; % Which one gets geq/leq and which gets > or < is dependent on how we decide on plotting, not on how we seperate the clusters. Because the values plotted actually correspond to max or min values in that cluster.
+    namesAdd = {['\leq'], ['\geq']}; % Which one gets geq/leq and which gets > or < is dependent on how we decide on plotting, not on how we seperate the clusters. Because the values plotted actually correspond to max or min values in that cluster.
     tempDatBools = {"Turn on", "optimization for depth 3"}; 
 end
 
@@ -93,7 +94,7 @@ bools = {... % Data 1
 boolsMult = {}; 
 names = {
     {'Trillium 240', 'Guralp CMG-3T', 'Trillium Compact'},... % Names 1
-    {'\leq', '>'},... % Names 2 % Which one gets geq/leq and which gets > or < is dependent on how we decide on plotting, not on how we seperate the clusters. Because the values plotted actually correspond to max or min values in that cluster. 
+    {'\leq', '\geq'},... % Names 2 % Which one gets geq/leq and which gets > or < is dependent on how we decide on plotting, not on how we seperate the clusters. Because the values plotted actually correspond to max or min values in that cluster. 
      namesAdd,...%}... % Names 3
     }; 
 
@@ -459,7 +460,7 @@ if showSpectrograms; % show spectrograms sort of morphed into plot anything.
         text(xtxt, -3, sprintf('Tot P=%6.0f', penaltyTijk), 'HorizontalAlignment', 'right'); 
     end
 
-    title(sprintf('%s, Datswitch=%1.0f, Component=%1.0f, %s -> %s -> %s', coh_or_spec, datswitch, component, cut1, cut2, cut3) ); 
+    title(sprintf('%s, Datswitch=%1.0f, Component=%1.0f, %s -> %s -> %s', coh_or_spec, datswitch, componentFull, cut1, cut2, cut3) ); 
 
     ylim([-3.5, 0]); 
     % xlim([-.275, .275]); 
@@ -513,7 +514,7 @@ if showSpectrograms; % show spectrograms sort of morphed into plot anything.
     uistack(ax134, 'bottom');
 
     % Save all the figs. 
-    textFig = sprintf('%s_Datswitch%1.0f_Comp%1.0f-%s-%s-%s', coh_or_spec, datswitch, component, cut1, cut2, cut3);  
+    textFig = sprintf('%s_Datswitch%1.0f_Comp%1.0f-%s-%s-%s', coh_or_spec, datswitch, componentFull, cut1, cut2, cut3);  
     exportgraphics(figure(12), sprintf('Figures/dendrogram__%s.pdf', textFig)); 
     exportgraphics(figure(132),sprintf('Figures/manual_sep/combined__%s.pdf', textFig));
     exportgraphics(figure(134), sprintf('Figures/dendrogram_spec__%s.pdf', textFig),...
