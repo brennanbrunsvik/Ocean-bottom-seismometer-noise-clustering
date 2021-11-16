@@ -3,7 +3,7 @@
 %         
 
 lineOrBar = 'line'; 
-showMeanPens = true; 
+showMeanPens = false; 
 % recalcOrder = false; % calculate the order of which variables did best at reducing penalty. 
 for recalcOrder = [true, false]; 
 

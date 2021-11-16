@@ -89,6 +89,9 @@ if ~isCat(iquant); % If is quantitative variable
         'For optimized dataset (water?) on %s, optimal split value (depth?) = %1.0f'...
         newline newline newline], ...
         '???', breakPen)
+    thisDat = OthVarMat(iquant,:); 
+    sprintf('For LARGE (deep?) subset: smallest value is: %1.0f', min(thisDat(dat1Boo)))
+    sprintf('For SMALL (shallow?) subset: largest value is: %1.0f', max(thisDat(dat2Boo)))
     
     % TODO need to get spectra plots going here
 else % If is a categorical data
