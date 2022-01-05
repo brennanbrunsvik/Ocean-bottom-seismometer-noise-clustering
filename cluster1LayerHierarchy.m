@@ -70,6 +70,7 @@ if ~isCat(iquant); % If is quantitative variable
         showPlot146 = true;        
         plot146Struct = struct(...
             'figSaveName', ['FIGURES/penalty_optimization/grid_search_' figSaveName]); 
+        plot146Struct.figDatName = sprintf('FIGURES/penalty_optimization/grid_search_comp_%2.0f_datType_%1.0f_data.mat', componentFull, datswitch); 
     end
     
     [     eachPenaltyTempTrue,...
@@ -119,7 +120,8 @@ if ~isCat(iquant); % If is quantitative variable
     sprintf('For LARGE (deep?) subset: smallest value is: %1.0f', min(thisDat(dat1Boo)))
     sprintf('For SMALL (shallow?) subset: largest value is: %1.0f', max(thisDat(dat2Boo)))
        
-    exportgraphics(gcf, ['FIGURES/penalty_optimization/' figSaveName]);
+    exportgraphics(gcf, ['FIGURES/penalty_optimization/' figSaveName], ...
+        'ContentType', 'Vector');
     
     
   

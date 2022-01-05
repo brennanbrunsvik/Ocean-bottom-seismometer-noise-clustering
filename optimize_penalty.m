@@ -136,6 +136,9 @@ if options.showPlot146;
     ylim([4, 5]); 
     sumPlt   = plot(newBreaks, eachPenaltyTempTotN  , 'k', 'linewidth', 1.5); 
     exportgraphics(gcf, options.plot146Struct.figSaveName); 
+    plotDat = struct('breaks', newBreaks', 'penalty', eachPenaltyTempTotN'); 
+    save(options.plot146Struct.figDatName, 'plotDat'); % Using this to combine a plot of multiple station components. bb2022.01.05. 
+    
 end
 
 end
