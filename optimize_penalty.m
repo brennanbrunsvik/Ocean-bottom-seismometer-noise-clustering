@@ -15,7 +15,10 @@ arguments
     showPlot
     numCut
     options.showPlot145 = false; 
-    options.optimPlotStruct = nan; 
+    options.optimPlotStruct = nan;
+    options.showPlot146 = false; 
+    options.plotFileName146 = 'junk'; 
+    options.plot146Struct = struct(); 
 end
     
 % thisData = dataSets.data1; 
@@ -125,6 +128,14 @@ if options.showPlot145;
     grid ON; 
     set(gca,'XMinorTick','on')
         
+end
+
+if options.showPlot146; 
+    figure(146); clf; hold on; 
+    box on; 
+    ylim([4, 5]); 
+    sumPlt   = plot(newBreaks, eachPenaltyTempTotN  , 'k', 'linewidth', 1.5); 
+    exportgraphics(gcf, options.plot146Struct.figSaveName); 
 end
 
 end

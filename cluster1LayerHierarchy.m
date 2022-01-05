@@ -2,7 +2,7 @@ function [penaltyT, penaltyUnClust] = cluster1LayerHierarchy(sameStasAllAnalyses
     showSpectrograms, showPenalOptim, penaltyFunction, ...
     coh_or_spec, datswitch, component, iquant); 
 
-
+componentFull = component; 
 
 OBS_TableParams;
 prep_data_wrapper; 
@@ -54,7 +54,24 @@ thissubplot = 1;
 
 
 if ~isCat(iquant); % If is quantitative variable
+    figSaveName = sprintf('%s_Datswitch%1.0f_Comp%2.0f___penalty_optimization_first_layer.pdf', coh_or_spec, datswitch, componentFull);  
+    if strcmp(figSaveName, 'spec_Datswitch1_Comp 1___penalty_optimization_first_layer.pdf'); 
+        figSaveName = 'penalty_optimization_water_depth_Z.pdf'; 
+    elseif strcmp(figSaveName, 'spec_Datswitch1_Comp23___penalty_optimization_first_layer.pdf'); 
+        figSaveName = 'penalty_optimization_water_depth_H.pdf'; 
+    elseif strcmp(figSaveName, 'spec_Datswitch2_Comp 1___penalty_optimization_first_layer.pdf'); 
+        figSaveName = 'penalty_optimization_water_depth_Zcorr.pdf'; 
+    end
+    
     thisax = subplot(4, 4, thissubplot); thissubplot = thissubplot + 1; 
+    plot146Struct = nan; 
+    showPlot146 = false; 
+    if iquant == 1; 
+        showPlot146 = true;        
+        plot146Struct = struct(...
+            'figSaveName', ['FIGURES/penalty_optimization/grid_search_' figSaveName]); 
+    end
+    
     [     eachPenaltyTempTrue,...
       eachPenaltyTempFalse,...
       eachPenaltyTempTot, ...
@@ -63,27 +80,36 @@ if ~isCat(iquant); % If is quantitative variable
       eachPenaltyTempTotN,...
       penBreak...
       ] = optimize_penalty(OthVarMat(iquant, :), dat, fnew, penaltyFunction, ...
-          thisax, showPenalOptim(1), 100); 
+          thisax, showPenalOptim(1), 100, 'showPlot146', showPlot146, ...
+          'plot146Struct', plot146Struct ); 
     title(sprintf('%s: min pen = %2.1f', labelsAll{iquant}, min(eachPenaltyTempTotN) ) ); 
 %     penaltyT = min(eachPenaltyTempTotN);
     penaltyT = min(eachPenaltyTempTot); 
     
+    
+   
     % bb2021.09.30 Plot the geq and leq data groups
     figure(208); clf; hold on; 
+    set(gcf, 'pos', [440 454 1166 344]); 
     [penMin, penMinI] = min(eachPenaltyTempTot); 
     breakPen = penBreak(penMinI); 
     dat1Boo = OthVarMat(iquant, :) >=breakPen; % In calusterWholeHierarchy I use >= and < I think
     dat2Boo = OthVarMat(iquant, :) < breakPen; 
+    indVar1 = OthVarMat(iquant, dat1Boo); % Independent variable 1, the large values. 
+    indVar2 = OthVarMat(iquant, dat2Boo); % Independent variable 2, the small values. 
     pen1 = cluster_spread(dat(dat1Boo,:), fnew, 'x \geq', subplot(1,3,2), 'showPlot', 'true', ...
         'penalty', penaltyFunction, 'barePlot', 'false', 'addColorbar', true);
+    xlabel(sprintf('\\geq %1.0f',min(indVar1))); 
     pen1av = pen1/sum(dat1Boo); 
     title(sprintf('Pav=%1.2f', pen1av)); 
     pen2 = cluster_spread(dat(dat2Boo,:), fnew, 'x <', subplot(1,3,3), 'showPlot', 'true', ...
         'penalty', penaltyFunction, 'barePlot', 'false', 'addColorbar', true); 
+    xlabel(sprintf('\\leq %1.0f',max(indVar2))); 
     pen2av = pen2/sum(dat2Boo);     
     title(sprintf('Pav=%1.2f', pen2av)); 
     penA = cluster_spread(dat           , fnew, 'all', subplot(1,3,1)           , 'showPlot', 'true', ...
         'penalty', penaltyFunction, 'barePlot', 'false', 'addColorbar', true); 
+    xlabel('All data'); 
     title(sprintf('Pav=%1.2f', penA/size(dat,1) )); 
     sprintf([newline newline newline...
         'For optimized dataset (water?) on %s, optimal split value (depth?) = %1.0f'...
@@ -92,6 +118,11 @@ if ~isCat(iquant); % If is quantitative variable
     thisDat = OthVarMat(iquant,:); 
     sprintf('For LARGE (deep?) subset: smallest value is: %1.0f', min(thisDat(dat1Boo)))
     sprintf('For SMALL (shallow?) subset: largest value is: %1.0f', max(thisDat(dat2Boo)))
+       
+    exportgraphics(gcf, ['FIGURES/penalty_optimization/' figSaveName]);
+    
+    
+  
     
     % TODO need to get spectra plots going here
 else % If is a categorical data

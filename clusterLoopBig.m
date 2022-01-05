@@ -2,7 +2,7 @@
 % close all; 
 sameStasAllAnalyses = true; 
 showSpectrograms = true; 
-% showPenalOptim = logical([0 1 0]); % 
+% showPenalOptim = logical([0 1 0]); disp('Use this only for 3 layer deep hierarchy thing')
 showPenalOptim = logical(1); disp('Use this only for 1 layer deep hierarchy thing')
 penaltyFunction = 'spectral_angle'; 
 coh_or_spec = 'spec'; % coherance (coh) or spectra (spec)
@@ -39,7 +39,7 @@ save('labelsAll', 'labelsAll');
 % some. 
 eachLayerDepth = [1]; % [1,3]; 
 % eachDatComp = [1:size(datCompSpec,2)]; 
-eachDatComp = [11]; % [1, 5, 11]; 
+eachDatComp = [1, 5, 11]; % [1, 5, 11]; 
 % eachQuant = [1:length(labelsAll)];  
 eachQuant = [1]; 
 savePenaltFile = false; 
