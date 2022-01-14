@@ -52,6 +52,13 @@ thissubplot = 1;
 
 % thisax = subplot(pltm, pltn, thissubplot); 
 
+penWholeData = cluster_spread(dat, fnew, 'Whole cluster', nan, ...
+    showPlot=false, penalty=penaltyFunction); 
+sprintf('Penalty for all data, before subdivisions: %1.3f', penWholeData)
+% penTempTrue = cluster_spread(dat(thisboolTemp,:),...
+%         fnew, 'Temporary', nan, ...
+%         showPlot=false, penalty=penaltyFunction)
+
 
 if ~isCat(iquant); % If is quantitative variable
     figSaveName = sprintf('%s_Datswitch%1.0f_Comp%2.0f___penalty_optimization_first_layer.pdf', coh_or_spec, datswitch, componentFull);  

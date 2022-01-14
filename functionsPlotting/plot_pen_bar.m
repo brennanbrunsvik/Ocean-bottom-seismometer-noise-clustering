@@ -1,9 +1,10 @@
 % bb2021.08.12 Make some bar plot to consolidate all the final penalty
 % information. 
 %         
+clear allEachPenalty2Deep 
 
 lineOrBar = 'line'; 
-showMeanPens = false; 
+showMeanPens = true; 
 % recalcOrder = false; % calculate the order of which variables did best at reducing penalty. 
 for recalcOrder = [true, false]; 
 
@@ -108,7 +109,13 @@ for idatcomp = eachDatComp; % Loop through all combinations of datswitcs, seismo
         eachPenalty2Deep(isnan(eachPenalty)) = nan; % Don't plot 2 deep penalty where we don't have 3 deep penalty. 
         plot([1:size(eachPenalty,1)]', eachPenalty2Deep, ...
             '-', 'linewidth', 0.75, 'Color', cmap(idatcomp,:)); 
-
+        
+        allEachPenalty2Deep(:,idatcomp) = eachPenalty2Deep; % Matrix to keep track of 2 deep penalty for each component
+        if (~recalcOrder) && showMeanPens && (idatcomp == eachDatComp(end));
+            allMean = mean(nanmean(allEachPenalty2Deep)) .* ones(size(eachPenalty2Deep)); 
+            plot([1:size(eachPenalty,1)]', allMean, ...
+                '--', 'linewidth', 0.75, 'Color', 'k', 'DisplayName', 'none');             
+        end
     %     scatter(find(rmv3Lyr(penaltySortPlot)), [1 1].* eachPenalty2Deep(scndLyr),...
     %         40, cmap(idatcomp,:), 'filled' ); % find where the second layers label is. Make some scatter dots there. 
     end
@@ -163,7 +170,7 @@ end % End each dat comp
 %     save('penaltySortPlot.mat', 'penaltySortPlot'); 
 % end % end sorting
 if all(penaltySortPlot == [1:length(penaltySortPlot)]'); % Don't calculate the new order if you were already re-ordering things!!!
-    meanPen = mean(allBar, 2); 
+    meanPen = mean(allBar, 2);
     [~,penaltySortPlot] = sort(meanPen);
     penaltySortPlot = penaltySortPlot(end:-1:1); 
     save(['penaltySortPlotDepth' num2str(iLayerDepth) '.mat'], 'penaltySortPlot'); 
