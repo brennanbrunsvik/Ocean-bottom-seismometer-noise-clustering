@@ -1,10 +1,10 @@
 % bb2021.08.12 Make some bar plot to consolidate all the final penalty
 % information. 
-%         
+% Should be one folder above the folder holding this script to run it. . 
 clear allEachPenalty2Deep 
 
 lineOrBar = 'line'; 
-showMeanPens = true; 
+showMeanPens = false; 
 % recalcOrder = false; % calculate the order of which variables did best at reducing penalty. 
 for recalcOrder = [true, false]; 
 
@@ -37,7 +37,7 @@ datCompLabels = {'Z', 'H1', 'H2', 'P', ... % Uncorrected spec
 labelsAllUnsort = load('labelsAll');
 labelsAllUnsort = labelsAllUnsort.labelsAll; 
 
-rmv3Lyr = logical([1 0 0 0 0 0 0 1 0 0 0 ]'); 
+rmv3Lyr = logical([1 0 0 0 0 0 0 1 0 0 0 ]'); % Remove water depth and some other things. 
 frstLyr = 8; 
 scndLyr = 1; 
         

@@ -115,4 +115,26 @@ suff{10} = 'Environment';
 cats(11).data = expvec(gind);
 suff{11} = 'Experiment';
 
+% % %%%% brb2022.02.08 Rough gain correction on some stations. 
+% % exper = string(cats(11).data); 
+% % seism = string(cats(8 ).data); 
+% % 
+% % gainBad = seism   == "Trillium 240"; 
+% % experBad = and( (exper ~= "Nm"), (exper ~= "Ma") ); % Nm and Ma 
+% % gainBad = and(gainBad, experBad)'; 
+% % % exper(~experBad); % This gives us Ma and Nm, which are supposedly good gain. 
+% % dat2 = dat; 
+% % dat2(gainBad,:) = dat(gainBad,:) + 10; % Add 10 db, which is roughly the gain error. 
+% % 
+% % 
+% % figure(1); clf; hold on; 
+% % subplot(1,2,1); hold on; 
+% % plot(dat'); 
+% % subplot(1,2,2); hold on; 
+% % plot(dat2'); 
+% % 
+% % dat = dat2; 
+% % %%%% brb2022.02.08 END Tests about some gain problems in DMC. 
+
+
 % component = 2; datswitch=1; prep_data; figure(1); clf; hold on; plot(dat')
