@@ -37,10 +37,10 @@ save('labelsAll', 'labelsAll');
         
 % This chooses which analysis to do. Loop through all analyses, or just do
 % some. 
-eachLayerDepth = [1,3]; % [1,3]; 
+eachLayerDepth = [3]; % [1,3]; 
 % eachDatComp = [1:size(datCompSpec,2)]; 
-eachDatComp = [1,5,11]; % [1, 5, 11]; 
-eachQuant = [1:length(labelsAll)];  
+eachDatComp = [1]; % [1, 5, 11]; 
+eachQuant = [3]; % [1:length(labelsAll)];  
 % eachQuant = 1; 
 savePenaltFile = false; 
 % warning('You are overwriting penalty files for plotting!')

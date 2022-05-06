@@ -7,7 +7,13 @@ Nclusts   = length(bootBools);
 
 permuteNValues = [2, 5, floor([1/20, 1/8, 1/2, 1] .* Nspectra)]; % Using something automatic like this in case the number of input spectra changes. 
 % permuteNValues = [Nspectra]; % Using something automatic like this in case the number of input spectra changes. 
+averagePenalties = true; 
 
+if averagePenalties; 
+    fprintf('Penalty actual: %1.3f', penaltyActual)
+    penaltyActual = penaltyActual ./ Nspectra; 
+    fprintf('Penalty actual averaged: %1.3f', penaltyActual)
+end
 
 bootPen = nan(NStraps, length(permuteNValues));  % shape = (each bootstrap like analisis, by each number of permuted values)
 % for ithisPermuteN = 1:length(permuteNValues); 
@@ -32,11 +38,29 @@ parfor istrap = [1:NStraps];
         newBool(newInds) = true; % Use disp to see the number of true elements in each new bool. Should, and does, sume to same number as was in original bools.
         eachPen(ibool) = cluster_spread(dat(newBool,:), fnew, '', nan, ...
                                 showPlot=false, penalty=penaltyFunction); 
+% %         if averagePenalties; 
+% %             eachPen(ibool) = eachPen(ibool) ./ length(newInds); % fprintf('\n There were %1.0f spectra in this group',length(newInds))
+% %         end
 %         eachNewBool{ibool} = newBool; % Remove this later for speed TODO
     end
+    
+    if averagePenalties; 
+        % In cluster_spread, we get "average" angle between one spectra and
+        % all other spectra. For reporting penalties, clusterWholeHierarchy
+        % simply sums all of those penalties. Penalty reduction doesn't
+        % utilize any averaging. For reporting the average penalties in a
+        % group, i simply was dividing by the number of spectra in that
+        % group. I don't think I ever reported average penalties across an
+        % entire subgrouping, that was always penalty reduction. 
+        eachPen = eachPen ./ Nspectra; 
+    end
+    
     bootPen(istrap, ithisPermuteN) = sum(eachPen); 
 end
  
+% Penalty in clusterwholehierarchy.m is simply penalty/numSpectra, where
+% penalty is the output of cluster_spread
+
 % Calculate some stats from the boot like analysis
 stdb = std(bootPen,1); 
 meanb = mean(bootPen,1); 
@@ -51,6 +75,9 @@ if showBootPlot;
     unClustPen = cluster_spread(dat, fnew, '', nan, ...
                         showPlot=false, penalty=penaltyFunction);
                     
+    if averagePenalties; 
+        unClustPen = unClustPen ./ Nspectra; 
+    end
                     
                 
     figure(300); set(gcf, 'pos', [-1129 281 842 731]); clf; hold on; 
@@ -95,7 +122,7 @@ if showBootPlot;
 %             'EdgeColor', 'k', 'BackgroundColor', 0.98 .* [1 1 1],... 
 %             'horizontalalignment', 'left', 'verticalalignment', 'top'); 
         thisTxt = text(0.04, 1-0.05, ... % 0.05, 0.85, ...
-            sprintf('\\sigma = %1.1f%c\nZ = %1.1f', ...
+            sprintf('\\sigma = %1.3f%c\nZ = %1.1f', ...
                 stdb(ithisPermuteN),...
                 char(176),...
                 stdDist(ithisPermuteN) ),...

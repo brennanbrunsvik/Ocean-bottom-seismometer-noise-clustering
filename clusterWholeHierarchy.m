@@ -2,7 +2,7 @@ function [penaltyTijk, penaltyTij, penaltyTi, penaltyUnClust] = clusterWholeHier
     showSpectrograms, showPenalOptim, penaltyFunction, ...
     coh_or_spec, datswitch, component, iquant); 
 
-try_boot_penalties = false; % Parameter you change. Decide if you want to do the significance analysis or not. 
+try_boot_penalties = true; % Parameter you change. Decide if you want to do the significance analysis or not. 
 
 componentFull = component; % For component = 23, It's going to get changed to 3 (I think). So some figures might be saved with component 3 instead... bb2021.11.01
 OBS_TableParams;
