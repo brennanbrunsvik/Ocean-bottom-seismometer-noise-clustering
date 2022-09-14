@@ -13,3 +13,5 @@
 **.aux 
 **.log 
 **.gz 
+
+!FIGURES/manual_sep/
