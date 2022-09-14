@@ -2,7 +2,7 @@ clear;
 close all; 
 
 sameStasAllAnalyses = true; % Don't use a station unless it can be used in every analysis. 
-showSpectrograms = false; % Set to false to save some time. 
+showSpectrograms = true; % Set to false to save some time. 
 penaltyFunction = 'spectral_angle'; % Spectral angle or Euclidean (check code for precise spelling). 
 coh_or_spec = 'spec'; % coherance (coh) or spectra (spec)
 

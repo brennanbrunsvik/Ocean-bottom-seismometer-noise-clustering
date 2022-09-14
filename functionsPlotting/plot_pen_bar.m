@@ -1,14 +1,13 @@
-% bb2021.08.12 Make some bar plot to consolidate all the final penalty
-% information. 
-% Should be one folder above the folder holding this script to run it. . 
+% bb2021.08.12 Make some plot to consolidate all the final penalty information. 
 clear allEachPenalty2Deep 
 
-lineOrBar = 'line'; 
-showMeanPens = false; 
-% recalcOrder = false; % calculate the order of which variables did best at reducing penalty. 
-for recalcOrder = [true, false]; 
+lineOrBar = 'line'; % brb2022.09.12 Might not work with "bar" anymore. 
+showMeanPens = false; % Can plot mean of penalty reduction across components. 
 
-whichAnalyze = [1, 5, 11]; 
+% recalcOrder = false; % calculate the order of which variables did best at reducing penalty. 
+for recalcOrder = [true, false]; % First, figure out the order to plot things left/right. Then actually plot. 
+
+whichAnalyze = [1, 5, 11]; % datCompSpec index
 
 datCompSpec = {...
     {1,1,'spec'},...
@@ -24,7 +23,6 @@ datCompSpec = {...
     {1,23,'spec'}... % Both horizontal 1 and 2. 
     };
 
-
 symbolsScatter = {'o','+','*','.','x','_','|','s','d','^','v','>','<','p','h'}; 
 
 datCompLabels = {'Z', 'H1', 'H2', 'P', ... % Uncorrected spec
@@ -34,11 +32,11 @@ datCompLabels = {'Z', 'H1', 'H2', 'P', ... % Uncorrected spec
 % labelsAllUnsort = {'Water Depth'; 'Plate Bndy Dist'; 'Coastline Dist'; ...
 %             'Crustal Age'; 'Sediment Thickn'; 'Surface Current';...
 %             'OBS Design'; 'Seismometer'; 'Pressure Gauge'; 'Environment'; 'Experiment'};
-labelsAllUnsort = load('labelsAll');
+labelsAllUnsort = load('labelsAll'); % Gets saved in clusterLoopBig.m
 labelsAllUnsort = labelsAllUnsort.labelsAll; 
 
 rmv3Lyr = logical([1 0 0 0 0 0 0 1 0 0 0 ]'); % Remove water depth and some other things. 
-frstLyr = 8; 
+frstLyr = 8; % Determine order. Of hierarchy? 
 scndLyr = 1; 
         
 datCompSpec = datCompSpec(whichAnalyze); 
@@ -46,29 +44,25 @@ symbolsScatter = symbolsScatter(whichAnalyze);
 datCompLabels = datCompLabels(whichAnalyze); 
 
 
-% This chooses which analysis to do. Loop through all analyses, or just do
-% some. 
+% This chooses which analysis to do. Loop through all analyses, or just do some. 
 eachLayerDepth = [1,3]; % plot 3 layer deep first, since penalties are lower, and bars goes beneath 1 layer deep
 eachDatComp = [1:size(datCompSpec,2)]; 
 eachQuant = [1:length(labelsAllUnsort)];  
         
 figure(70); clf; set(gcf, 'pos', [-1069 1452 702 257]); hold on; 
-t = tiledlayout(1,2,'TileSpacing','tight','Padding','compact');
-% cmap = jet(length(eachDatComp));
-% cmap = hsv(length(eachDatComp)); 
-% cmap = lines(length(eachDatComp)); 
-% cmap = colorcube(length(eachDatComp)); 
+t = tiledlayout(1,2,'TileSpacing','tight','Padding','compact'); % Use tiled layout instead of subplot for tighter subplots. 
+% cmap = jet(length(eachDatComp)); cmap = hsv(length(eachDatComp)); cmap = lines(length(eachDatComp)); cmap = colorcube(length(eachDatComp)); 
 cmap = [ 48, 120, 0; 156, 0, 72; 255, 153, 0]./255; 
 
-% Main plotting loop
+%%% Main plotting loop
 for iLayerDepth = eachLayerDepth; % Do layer depths seperately. Easiest coding solution, since single or multiple layer analyses used the same figure windows, and were originally intended to run seperately. 
 indLayerDepth = find(iLayerDepth == eachLayerDepth); 
-allBar = []; 
+allBar = []; % Holding some info for plotting through loop. 
 legPlots = []; % Hold plot handles to add to legend. 
 legPlotsLevel = []; % Hold plot handles to add to legend only showing dashed, dotted, etc. 
 
-nexttile; %     subplot(length(eachLayerDepth), 1, indLayerDepth); 
-hold on; 
+nexttile; hold on; 
+
 for idatcomp = eachDatComp; % Loop through all combinations of datswitcs, seismometer component, and spectra/coherance. 
     % for idatcomp = [1:size(datcomp, 1)]; 
     % iLayerDepth = 3; idatcomp = 1; disp('Delete this line')
@@ -78,16 +72,16 @@ for idatcomp = eachDatComp; % Loop through all combinations of datswitcs, seismo
     coh_or_spec = thisDatCompSpec{3}; 
 
     finPenFile = sprintf('pen_results/penalties_%s_layerDepth%1.0f_datswitch%1.0f_component%1.0f.mat',...
-        coh_or_spec, iLayerDepth, datswitch, component);
+        coh_or_spec, iLayerDepth, datswitch, component); % .mat file containing all penalty stuff, I think made with clusterLoopBig.m
 
     finPenData = load(finPenFile).finPenData; 
-    penaltyUnClust = finPenData.penaltyUnClust; 
-    eachPenalty = finPenData.eachPenalty; 
+    penaltyUnClust = finPenData.penaltyUnClust; % Penalty before clustering
+    eachPenalty = finPenData.eachPenalty; % Penalties after clustering
     eachPenalty = eachPenalty ./ penaltyUnClust .* 100; % normalize penalties to what it would be if they were not clustered
     eachPenalty = 100 - eachPenalty; % Converting to penalty reduction
         
     penaltySortPlot = [1:length(eachPenalty)]'; 
-    if ~ recalcOrder; 
+    if ~ recalcOrder; % Looping over recalcOrder = true and false. Have to find order of what has highest penalty reduction for determining order. After finding the order, make the plotting. 
         load(['penaltySortPlotDepth' num2str(iLayerDepth) '.mat']); % Need to run first time with recalcOrder True. Then you can run with recalcOrder false, and it displays things in the correct order. 
         if showMeanPens
             meanPenPlot = load(['meanPenPlot' num2str(iLayerDepth) '.mat']).meanPen(penaltySortPlot); % Get average accross components. 
@@ -107,6 +101,7 @@ for idatcomp = eachDatComp; % Loop through all combinations of datswitcs, seismo
         eachPenalty2Deep = eachPenalty2Deep(penaltySortPlot); 
         eachPenalty(rmv3Lyr(penaltySortPlot)) = nan; % Have to keep the re-ordering rmv3Lyr here, or else it gets reordered 3 times. 
         eachPenalty2Deep(isnan(eachPenalty)) = nan; % Don't plot 2 deep penalty where we don't have 3 deep penalty. 
+        
         plot([1:size(eachPenalty,1)]', eachPenalty2Deep, ...
             '-', 'linewidth', 0.75, 'Color', cmap(idatcomp,:)); 
         
@@ -120,27 +115,18 @@ for idatcomp = eachDatComp; % Loop through all combinations of datswitcs, seismo
     %         40, cmap(idatcomp,:), 'filled' ); % find where the second layers label is. Make some scatter dots there. 
     end
 
-
-
-
     allBar = [allBar, eachPenalty];
 
-    %% Line plots
+    %%% Line plots
     if strcmp(lineOrBar, 'line'); 
         if iLayerDepth == 1; 
-%             nothing = plot([1:size(eachPenalty,1)]', eachPenalty, ...
-%                 '-', 'linewidth', .25, 'Color', cmap(idatcomp,:)); % Line connecting dots. Not totally necessary. 
-%             scat1 = scatter([1:size(eachPenalty,1)]', eachPenalty, 100, cmap(idatcomp,:), 'Marker', '+', 'LineWidth', 3); 
-%             scat1 = scatter([1:size(eachPenalty,1)]', eachPenalty, 100, cmap(idatcomp,:), 'Marker', 'o', 'LineWidth', 3); 
             scat1 = scatter([1:size(eachPenalty,1)]', eachPenalty, 40, cmap(idatcomp,:), '*', 'linewidth', 1); 
         elseif iLayerDepth ==3
-%             nothing = plot([1:size(eachPenalty,1)]', eachPenalty, ...
-%                 '-', 'linewidth', .25, 'Color', cmap(idatcomp,:)); 
             scat3 = scatter([1:size(eachPenalty,1)]', eachPenalty, 40, cmap(idatcomp,:), '*', 'linewidth', 1); 
-            legPlots(idatcomp) = scat3; 
+            legPlots(idatcomp) = scat3; % Handle for making legend. 
         end
     end
-    %%% end line plots
+    %%% 
 
 
     if strcmp(lineOrBar, 'line'); 
@@ -161,8 +147,7 @@ for idatcomp = eachDatComp; % Loop through all combinations of datswitcs, seismo
     end
 end % End each dat comp
 
-% calculate the best order to plot penalties, from most reduction to least
-% left to right. 
+% calculate the best order to plot penalties, from most reduction to least left to right. 
 % if (iLayerDepth == 1) && all(penaltySortPlot == [1:length(penaltySortPlot)]'); % Don't calculate the new order if you were already re-ordering things!!!
 %     meanPen = mean(allBar, 2); 
 %     [~,penaltySortPlot] = sort(meanPen);
@@ -189,12 +174,13 @@ end
 
 % Remaining plotting options
 ylim([0 40 ]);  
+set(gca, 'xticklabel', labelsAll(~isnan(eachPenalty)), 'XTickLabelRotation', 25,'XTick', find(~isnan(eachPenalty) )); % find(~isnan(eachpenalty)) gives positions ofticks to label. It excludes ones where we have a nan penalty.  
 
 % x labels
 % if iLayerDepth ~= eachLayerDepth(end); 
 %     set(gca, 'xticklabel', []); 
 % else 
-    set(gca, 'xticklabel', labelsAll(~isnan(eachPenalty)), 'XTickLabelRotation', 25,'XTick', find(~isnan(eachPenalty) )); % find(~isnan(eachpenalty)) gives positions ofticks to label. It excludes ones where we have a nan penalty.  
+    % set(gca, 'xticklabel', labelsAll(~isnan(eachPenalty)), 'XTickLabelRotation', 25,'XTick', find(~isnan(eachPenalty) )); % find(~isnan(eachpenalty)) gives positions ofticks to label. It excludes ones where we have a nan penalty.  
     % for itxt = [1:length(labelsAll)]; 
     %     textH = text(itxt, miny-1, [labelsAll{itxt} '   '] ,...
     %         'Rotation', 45, 'HorizontalAlignment', 'right'); 
@@ -202,6 +188,7 @@ ylim([0 40 ]);
     % set(gca, 'xtick', []); 
 % end
 % end x labels
+
 if indLayerDepth == 1; 
     ylabel('Penalty reduction (%)'); 
 end
