@@ -41,7 +41,7 @@ eachQuant = [3]; % [1:length(labelsAll)]; % Refers to which quality to assess. P
 % eachQuant = 1; 
 savePenaltFile = false; if savePenaltFile; warning('You are overwriting penalty files that are used for plotting!'); end % Save penalty calculation files. At some point you have to do this, and loop through all hierarchy depths and labels, so that we can make plots of all those results. 
 
-
+% ANOTHER IMPORTANT PARAMETER:try_boot_penalties = true/false in clusterWholeHierarchy.m. This determines if we try shuffling stations and calculating penalty to deremine how much penalty reduction is significant. 
         
 for iLayerDepth = eachLayerDepth; % Do layer depths seperately. Easiest coding solution, since single or multiple layer analyses used the same figure windows, and were originally intended to run seperately. 
 for idatcomp = eachDatComp; % Loop through all combinations of datswitcs, seismometer component, and spectra/coherance. 
