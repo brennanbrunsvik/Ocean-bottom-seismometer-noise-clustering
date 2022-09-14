@@ -8,7 +8,7 @@ coh_or_spec = 'spec'; % coherance (coh) or spectra (spec)
 
 addpath('./boot'); 
 addpath('./functionsPlotting'); 
-addpath('./otherPplCode'); 
+% addpath('./otherPplCode'); 
 set(groot, 'defaultAxesFontName', 'helvetica'); 
 
 % Which combination of data, station component, and whether using spectra or coherance. Choose a combination using an integer. I think 1, 5, and 11 are most important. 

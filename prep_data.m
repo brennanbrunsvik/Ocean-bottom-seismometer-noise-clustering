@@ -50,7 +50,7 @@ if ~exist(figoutpath)
 end
 
 % Reading in the SOM:
-addpath([getdr,'/somtoolbox'])
+% addpath([getdr,'/somtoolbox'])
 
 %% Running the SOM algorithm:
 
