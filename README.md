@@ -7,7 +7,7 @@ The code is not necessarily edited/finalized to be self-explanatory, but you may
 
 To get started, simply run **clusterLoopBig.m**. See comments in that file to understand how to run different analyses. 
 
-**plot_pen_bar.m** makes the plots that show penalty reduction compilation, from several station characteristics, and multiple hierarchy levels. You should be able to immediately run this file from the root folder of this project (even though plot_pen_bar.m is not in the root folder). See Figure 5 (as of 2022.09.12). If you want to re-do the penalty calculations that go into this plot, there are a few steps. You have to run clusterLoopBig.m with savePenaltFile = true, over all station characteristics (all datCompSpec), over both layer depths (1 and 3). This produces the .mat file that stores the data ploted in plot_pen_bar.m. 
+**plot_pen_bar.m** makes the plots that show penalty reduction compilation, from several station characteristics, and multiple hierarchy levels. You should be able to immediately run this file. See Figure 5 (as of 2022.09.12). If you want to re-do the penalty calculations that go into this plot, there are a few steps. You have to run clusterLoopBig.m with savePenaltFile = true, over all station characteristics (all datCompSpec), over both layer depths (1 and 3). This produces the .mat file that stores the data ploted in plot_pen_bar.m. 
 
 This does not include code to actually calculate Spectra (e.g. the SpecIn.mat and similar files). You may need to contact Helen Janiszewski for that code. I included the spectra .mat files from our paper in this repository. 
 

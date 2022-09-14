@@ -1,5 +1,4 @@
 % bb2021.08.12 Make some plot to consolidate all the final penalty information. 
-% RUN THIS FROM THE ROOT FOLDER OF THIS PROJECT, same folder as clusterLoopBig.m
 clear allEachPenalty2Deep 
 
 lineOrBar = 'line'; % brb2022.09.12 Might not work with "bar" anymore. 
